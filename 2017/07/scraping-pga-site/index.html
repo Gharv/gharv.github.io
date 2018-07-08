@@ -1,0 +1,798 @@
+
+
+  
+    
+  
+
+
+  
+
+
+
+
+  
+
+
+  
+
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="generator" content="Hugo 0.42.1 with theme Tranquilpeak 0.4.3-BETA">
+    <title>Scraping PGA Site</title>
+    <meta name="author" content="Greg Harvey">
+    <meta name="keywords" content=", r, data, analytics, sports, economics, golf, football">
+
+    <link rel="icon" href="http://res.cloudinary.com/gharv/image/upload/v1501075122/money_golf_ball_m6oucp.png">
+    
+
+    
+    <meta name="description" content="To begin we want to use the json data from the PGA tour website. After doing some investigation into the PGA tour website, there are both pros and cons of using it for scraping.
+From what I have found we will only be able to get shot data from 2014 and beyond. This will contain any data we would want but only goes back to 2014, before 2014 there isn’t even data for simple scorecards for players.">
+    <meta property="og:description" content="To begin we want to use the json data from the PGA tour website. After doing some investigation into the PGA tour website, there are both pros and cons of using it for scraping.
+From what I have found we will only be able to get shot data from 2014 and beyond. This will contain any data we would want but only goes back to 2014, before 2014 there isn’t even data for simple scorecards for players.">
+    <meta property="og:type" content="blog">
+    <meta property="og:title" content="Scraping PGA Site">
+    <meta property="og:url" content="/2017/07/scraping-pga-site/">
+    <meta property="og:site_name" content="Sportnomics">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="Sportnomics">
+    <meta name="twitter:description" content="To begin we want to use the json data from the PGA tour website. After doing some investigation into the PGA tour website, there are both pros and cons of using it for scraping.
+From what I have found we will only be able to get shot data from 2014 and beyond. This will contain any data we would want but only goes back to 2014, before 2014 there isn’t even data for simple scorecards for players.">
+    
+    
+
+    
+    
+
+    
+      <meta property="og:image" content="//www.gravatar.com/avatar/d03bc8e23b9b38d63432dc7973514ec4?s=640">
+    
+
+    
+      <meta property="og:image" content="http://res.cloudinary.com/gharv/image/upload/v1501073281/pga_tour_banner_b1ap0f.png">
+    
+    
+      <meta property="og:image" content="http://res.cloudinary.com/gharv/image/upload/v1504197764/Nicklaus_13th-2_psqkvu.jpg">
+    
+    
+
+    
+
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" integrity="sha256-eZrrJcwDc/3uDhsdt61sL2oOBY362qM3lon1gyExkL0=" crossorigin="anonymous" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/2.1.4/jquery.fancybox.min.css" integrity="sha256-vuXZ9LGmmwtjqFX1F+EKin1ThZMub58gKULUyf0qECk=" crossorigin="anonymous" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/2.1.4/helpers/jquery.fancybox-thumbs.min.css" integrity="sha256-SEa4XYAHihTcEP1f5gARTB2K26Uk8PsndQYHQC1f4jU=" crossorigin="anonymous" />
+    
+    
+    <link rel="stylesheet" href="/css/style-jsjn0006wyhpyzivf6yceb31gvpjatbcs3qzjvlumobfnugccvobqwxnnaj8.min.css" />
+    
+    
+
+    
+      
+    
+    
+  </head>
+
+  <body>
+    <div id="blog">
+      <header id="header" data-behavior="5">
+  <i id="btn-open-sidebar" class="fa fa-lg fa-bars"></i>
+  <div class="header-title">
+    <a class="header-title-link" href="/">Sportnomics</a>
+  </div>
+  
+    
+      <a class="header-right-picture "
+         href="/#about">
+    
+    
+    
+      
+        <img class="header-picture" src="//www.gravatar.com/avatar/d03bc8e23b9b38d63432dc7973514ec4?s=90" alt="Author&#39;s picture" />
+      
+    
+    </a>
+  
+</header>
+
+      <nav id="sidebar" data-behavior="5">
+  <div class="sidebar-container">
+    
+      <div class="sidebar-profile">
+        <a href="/#about">
+          <img class="sidebar-profile-picture" src="//www.gravatar.com/avatar/d03bc8e23b9b38d63432dc7973514ec4?s=110" alt="Author&#39;s picture" />
+        </a>
+        <h4 class="sidebar-profile-name">Greg Harvey</h4>
+        
+          <h5 class="sidebar-profile-bio">Statistics student interested in analytics for sports and economics</h5>
+        
+      </div>
+    
+    <ul class="sidebar-buttons">
+      
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-home"></i>
+      
+      <span class="sidebar-button-desc">Home</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="/categories">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-list-ul"></i>
+      
+      <span class="sidebar-button-desc">Categories</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="/tags">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-tags"></i>
+      
+      <span class="sidebar-button-desc">Tags</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="/archives">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-archive"></i>
+      
+      <span class="sidebar-button-desc">Archives</span>
+    </a>
+  </li>
+
+
+    </ul>
+    <ul class="sidebar-buttons">
+      
+
+    </ul>
+    <ul class="sidebar-buttons">
+      
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="/categories/football">
+    
+      <i class="sidebar-button-icon fa fa-facebook "></i>
+      
+      <span class="sidebar-button-desc">Football</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="/categories/golf">
+    
+      <i class="sidebar-button-icon fa fa-ravelry "></i>
+      
+      <span class="sidebar-button-desc">Golf</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="/categories/economics">
+    
+      <i class="sidebar-button-icon fa fa-money "></i>
+      
+      <span class="sidebar-button-desc">Economics</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="/categories/esports">
+    
+      <i class="sidebar-button-icon fa fa-twitch "></i>
+      
+      <span class="sidebar-button-desc">eSports</span>
+    </a>
+  </li>
+
+
+    </ul>
+  </div>
+</nav>
+
+      
+  <div class="post-header-cover
+              text-left
+              "
+       style="background-image:url('http://res.cloudinary.com/gharv/image/upload/v1504197764/Nicklaus_13th-2_psqkvu.jpg')"
+       data-behavior="5">
+    
+      <div class="post-header main-content-wrap text-left">
+  
+    <h1 class="post-title" itemprop="headline">
+      Scraping PGA Site
+    </h1>
+  
+  
+  <div class="postShorten-meta post-meta">
+    
+      <time itemprop="datePublished" datetime="2017-07-25T00:00:00Z">
+        
+  July 25, 2017
+
+      </time>
+    
+    
+  
+  
+    <span>in</span>
+    
+      <a class="category-link" href="/categories/golf">Golf</a>
+    
+  
+
+  </div>
+
+</div>
+    
+  </div>
+
+
+      <div id="main" data-behavior="5"
+        class="hasCover
+               hasCoverMetaIn
+               ">
+        <article class="post" itemscope itemType="http://schema.org/BlogPosting">
+          
+          
+          <div class="post-content markdown" itemprop="articleBody">
+            <div class="main-content-wrap">
+              <!--more-->
+<p>To begin we want to use the json data from the <a href="http://www.pgatour.com/">PGA tour website</a>. After doing some investigation into the PGA tour website, there are both pros and cons of using it for scraping.</p>
+<p>From what I have found we will only be able to get <strong>shot data</strong> from 2014 and beyond. This will contain any data we would want but only goes back to 2014, before 2014 there isn’t even data for simple <strong>scorecards</strong> for players. The only data available is each players round scores. Another issue is that the four majors of the year also do not have shot data.</p>
+<p>I will briefly cover how I came to this conclusion and in the next post we will look into another website for <strong>scorecard data</strong> before 2014 (maybe ESPN). The steps we will go through are :</p>
+<ol style="list-style-type: decimal">
+<li>Look into <a href="http://www.pgatour.com/">PGA tour website</a> layout to find their data</li>
+<li>Build a script to scrape the data</li>
+<li>Write functions so it can be easily ported for multiple tournaments and future tournaments</li>
+</ol>
+<div id="finding-the-data" class="section level2">
+<h2>Finding the Data</h2>
+<p>This part is can be quick or take very long, but the more you get used to exploring data the quicker you become at finding what you need in a nice format. Any website that store data typically store them in <strong>JSON</strong> or <strong>XML</strong> files. This is what we are going to look for.</p>
+<p>You might be asking, well many sites have external APIs, why can’t we just use that? The issue with external facing APIs is unless their is a pay wall they do not have a large incentive to keep the API up to date. This is why I prefer going directly to the website and finding the files called by the website. If an issue occurs with these files or need to be updated, everyone will notice and there is more incentive to keep it updated.</p>
+<p>Using chrome we are going to inspect a leader board page and look into the network section to find all files used for the webpage. Then we will filter for <strong>.json</strong> files.</p>
+<p>I am going to pick out an arbitrary tournament, all we need to make sure is that play-by-play data is available. Going to use the <a href="http://www.pgatour.com/competition/2017/travelers-championship/leaderboard.html">2017 Travelers Championship</a>. As we can see play-by-play data is available.</p>
+<hr />
+<p><img src="http://res.cloudinary.com/gharv/image/upload/v1501073836/showing_pbp_zrdks3.png" /></p>
+<p>Now we inspect the page source by right clicking anywhere on the webpage and selecting <em>Inspect</em>. Then we go to the Network tab and reload the page. We have to reload because some files load before we started the Inspect. Once everything is loaded then we can stop recording the network log and just type <strong>.json</strong> in the filter search box. Make sure we open a player and look at his play-by-play data. I am going to be using Jordan Spieth.</p>
+<hr />
+<p><img src="http://res.cloudinary.com/gharv/image/upload/v1501074121/showing_json_pga_qtwblt.png" /></p>
+<p>After going through this data we find that there are a few important JSON files such as :</p>
+<ul>
+<li>setup.json</li>
+<li>player_stats.json</li>
+<li>leaderboard-v2.json</li>
+<li>34046.json</li>
+</ul>
+<p>The most important one here is the <strong>34046.json</strong> which contains shot link data for Jordan Spieth. This is data can not be found anywhere else unless you have access to shot link data specifically which requires applying for shot link data and is only available to university researchers.</p>
+<p>So looking at the <strong>34046.json</strong> file we see that the URL before this file is <a href="https://statdata.pgatour.com/r/034/scorecards/" class="uri">https://statdata.pgatour.com/r/034/scorecards/</a>. This shows that the tourn_id is “034”. So now we need to build a function to extract the play-by-play data using this information.</p>
+<p>Before we can do this however we need to collect all the players IDs so this will be the first function we create and we are going to use the <strong>leaderboard-v2.json</strong> file.</p>
+<pre class="r"><code>get_field &lt;- function(tourn_id, year){
+  
+  require(jsonlite)
+  require(dplyr)
+  
+  url_seed &lt;- &quot;https://statdata.pgatour.com/r/&quot;  
+  
+  url_field &lt;- paste0(url_seed, tourn_id, &quot;/&quot;, year, &quot;/&quot;, &quot;leaderboard-v2.json&quot;)
+  dat &lt;- fromJSON(url_field)
+  field &lt;- select(dat$leaderboard$players, player_id, player_bio)
+  field$tournament_name &lt;- dat$leaderboard$tournament_name
+  field$tourn_id &lt;- tourn_id
+  field$year &lt;- year
+  return(field) 
+}</code></pre>
+<p>Now we have a function that gets all players and their <em>player_id</em> from the tournament we want. The next step we must undergo is creating a function to loop through all the players of a tournament and scraping their scorecard to get their play-by-play data.</p>
+<pre class="r"><code>get_pbp &lt;- function(tourn_id, year){
+  require(dplyr)
+  require(RCurl)
+  require(jsonlite)
+  
+  url_seed&lt;-&quot;https://statdata.pgatour.com/r/&quot;
+  
+  # create an empty data to store the results
+  df &lt;- data.frame()
+  round_info_all &lt;- data.frame()
+  
+  # retrieve the field for the tournament
+  
+  # loop over each player
+  field &lt;- get_field(tourn_id, year)
+  for (i in 1:nrow(field)){
+    
+    url_scorecard &lt;- paste0(url_seed, tourn_id, &quot;/&quot;, year, &quot;/scorecards/&quot;, 
+                            field$player_id[i], &quot;.json&quot;)
+    
+    # check if the url exists for that player (some players are in the field but withdraw)
+    if (!RCurl::url.exists(url_scorecard)) next
+    
+    dat &lt;- fromJSON(url_scorecard, simplifyDataFrame = TRUE)
+    
+    if (length(dat$p$rnds$n)==0) next
+    
+    # loop over the number of rounds
+    for (j in 1:length(dat$p$rnds$n)){ 
+      
+      if (length(dat$p$rnds$holes[[1]]) == 0) next
+      round_info &lt;- dat$p$rnds$holes[[j]][,1:5]
+      round_info &lt;- round_info %&gt;% rename(hole_number = cNum, 
+                                          score = sc, 
+                                          par_for_day = pDay, 
+                                          par_for_tourn = pTot) %&gt;% 
+        mutate(hole_number = as.numeric(hole_number),
+               score = as.numeric(score),
+               par_for_day = as.numeric(par_for_day, 
+                                        par_for_tourn = as.numeric(par_for_tourn)))
+      # add additional variables
+      round_info$round_number &lt;- j
+      round_info$pid &lt;- field$player_id[i]
+      
+      round_info$player_name &lt;- paste(field$player_bio$first_name[i], field$player_bio$last_name[i])
+      
+      round_info$tourn_id &lt;- tourn_id
+      round_info_all &lt;- rbind(round_info_all, round_info)
+      
+      
+      if (length(dat$p$rnds$holes[[j]]$shots) == 0 | 
+          length(dat$p$rnds$holes[[j]]$shots[[1]]) == 1 |
+          length(dat$p$rnds$holes[[j]]$shots[[1]]) == 0) next 
+      
+      shots &lt;-do.call(rbind, dat$p$rnds$holes[[j]]$shots)
+      
+      shots_length &lt;- sapply(dat$p$rnds$holes[[j]]$shots, nrow)
+      
+      shots &lt;- shots %&gt;% mutate(round_hole_num = as.numeric(n), putt = as.numeric(putt), 
+                                dist = as.numeric(dist), x = as.numeric(x),
+                                y = as.numeric(y), z = as.numeric(z)) %&gt;% 
+        rename(shot_num = n, putt_num = putt, 
+               distance = dist, x_loc = x, y_loc = y, z_loc = z,
+               type = t, dist_left = left, tee_shot = tee)
+      
+      shots$hole_number &lt;- rep(round_info$hole_number, times = shots_length)
+      shots &lt;- shots %&gt;% select(-pid)
+      
+      pbp &lt;- shots %&gt;% left_join(round_info, by = c(&quot;hole_number&quot;))
+      
+      df &lt;- rbind(df, pbp)
+    }
+    
+    Sys.sleep(2) # pause system for 2 seconds
+  }
+  
+  if (dim(df)[1] == 0) return(list(NULL, tbl_df(round_info_all)))
+  
+  df$year &lt;- year
+  df$tournament_name &lt;- field$tournament_name[1]
+  
+  # missing putts to zero
+  df$putt_num[is.na(df$putt_num)] &lt;- 0
+  
+  # reorder the variables
+  df &lt;- df %&gt;%  select(pid, player_name, tourn_id, tournament_name,
+                       round_number, hole_number, round_hole_num, shot_num,
+                       putt_num, type, prv, tee_shot, cup, from, to, asc,
+                       distance, dist_left, x_loc, y_loc, z_loc, club, con, shotText,
+                       score, par_for_day, par_for_tourn) %&gt;% rename(shot_text = shotText)
+  
+  return(list(tbl_df(df), tbl_df(round_info_all)))
+}</code></pre>
+<p>Once we run this <em>get_pbp</em> function we will have a list of two data frames, the first contains all <strong>shot data</strong> while the second contains <strong>scorecard data</strong>. I am just going to name this newly created variable <em>travelers</em> after the tournament name.</p>
+<pre class="r"><code>travelers &lt;- get_pbp(&quot;034&quot;, 2017)
+
+# a little sample
+travelers[[1]] # shows 10 observations and all variables
+library(knitr)
+kable(head(select(travelers[[1]], player_name, hole_number, shot_text)))</code></pre>
+<p><img src="http://res.cloudinary.com/gharv/image/upload/v1501618122/sample_travelers_get_pbp_markky.png" /></p>
+<p>Now we have all the information we would want from the PGA tour website and will use this in latter posts to actually start running some analytics.</p>
+</div>
+
+              
+            </div>
+          </div>
+          <div id="post-footer" class="post-footer main-content-wrap">
+            
+              
+                
+                
+                  <div class="post-footer-tags">
+                    <span class="text-color-light text-small">TAGGED IN</span><br/>
+                    
+  <a class="tag tag--primary tag--small" href="/tags/r/">R</a>
+
+  <a class="tag tag--primary tag--small" href="/tags/golf/">golf</a>
+
+  <a class="tag tag--primary tag--small" href="/tags/scraping/">scraping</a>
+
+  <a class="tag tag--primary tag--small" href="/tags/shot-data/">shot data</a>
+
+  <a class="tag tag--primary tag--small" href="/tags/pga/">PGA</a>
+
+                  </div>
+                
+              
+            
+            
+  <div class="post-actions-wrap">
+      <nav >
+        <ul class="post-actions post-action-nav">
+          
+            <li class="post-action">
+              
+                <a class="post-action-btn btn btn--default tooltip--top" href="/2017/08/creating-golf-scores-database/" data-tooltip="Creating Golf Scores Database">
+              
+                  <i class="fa fa-angle-left"></i>
+                  <span class="hide-xs hide-sm text-small icon-ml">NEXT</span>
+                </a>
+            </li>
+            <li class="post-action">
+              
+                <a class="post-action-btn btn btn--default tooltip--top" href="/2017/07/the-hole-cloud/" data-tooltip="The Hole Cloud">
+              
+                  <span class="hide-xs hide-sm text-small icon-mr">PREVIOUS</span>
+                  <i class="fa fa-angle-right"></i>
+                </a>
+            </li>
+          
+        </ul>
+      </nav>
+    <ul class="post-actions post-action-share" >
+      
+        <li class="post-action hide-lg hide-md hide-sm">
+          <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions">
+            <i class="fa fa-share-alt"></i>
+          </a>
+        </li>
+        
+      
+      
+        <li class="post-action">
+          <a class="post-action-btn btn btn--default" href="#disqus_thread">
+            <i class="fa fa-comment-o"></i>
+          </a>
+        </li>
+      
+      <li class="post-action">
+        
+          <a class="post-action-btn btn btn--default" href="#">
+        
+          <i class="fa fa-list"></i>
+        </a>
+      </li>
+    </ul>
+  </div>
+
+
+            
+              
+                <div id="disqus_thread">
+  <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+              
+            
+          </div>
+        </article>
+        <footer id="footer" class="main-content-wrap">
+  <span class="copyrights">
+    &copy; 2018 Greg Harvey. All Rights Reserved
+  </span>
+</footer>
+
+      </div>
+      <div id="bottom-bar" class="post-bottom-bar" data-behavior="5">
+        
+  <div class="post-actions-wrap">
+      <nav >
+        <ul class="post-actions post-action-nav">
+          
+            <li class="post-action">
+              
+                <a class="post-action-btn btn btn--default tooltip--top" href="/2017/08/creating-golf-scores-database/" data-tooltip="Creating Golf Scores Database">
+              
+                  <i class="fa fa-angle-left"></i>
+                  <span class="hide-xs hide-sm text-small icon-ml">NEXT</span>
+                </a>
+            </li>
+            <li class="post-action">
+              
+                <a class="post-action-btn btn btn--default tooltip--top" href="/2017/07/the-hole-cloud/" data-tooltip="The Hole Cloud">
+              
+                  <span class="hide-xs hide-sm text-small icon-mr">PREVIOUS</span>
+                  <i class="fa fa-angle-right"></i>
+                </a>
+            </li>
+          
+        </ul>
+      </nav>
+    <ul class="post-actions post-action-share" >
+      
+        <li class="post-action hide-lg hide-md hide-sm">
+          <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions">
+            <i class="fa fa-share-alt"></i>
+          </a>
+        </li>
+        
+      
+      
+        <li class="post-action">
+          <a class="post-action-btn btn btn--default" href="#disqus_thread">
+            <i class="fa fa-comment-o"></i>
+          </a>
+        </li>
+      
+      <li class="post-action">
+        
+          <a class="post-action-btn btn btn--default" href="#">
+        
+          <i class="fa fa-list"></i>
+        </a>
+      </li>
+    </ul>
+  </div>
+
+
+      </div>
+      <div id="share-options-bar" class="share-options-bar" data-behavior="5">
+  <i id="btn-close-shareoptions" class="fa fa-close"></i>
+  <ul class="share-options">
+    
+  </ul>
+</div>
+<div id="share-options-mask" class="share-options-mask"></div>
+    </div>
+    
+    <div id="about">
+  <div id="about-card">
+    <div id="about-btn-close">
+      <i class="fa fa-remove"></i>
+    </div>
+    
+      <img id="about-card-picture" src="//www.gravatar.com/avatar/d03bc8e23b9b38d63432dc7973514ec4?s=110" alt="Author&#39;s picture" />
+    
+    <h4 id="about-card-name">Greg Harvey</h4>
+    
+      <div id="about-card-bio">Statistics student interested in analytics for sports and economics</div>
+    
+    
+      <div id="about-card-job">
+        <i class="fa fa-briefcase"></i>
+        <br/>
+        Student at UF
+      </div>
+    
+    
+      <div id="about-card-location">
+        <i class="fa fa-map-marker"></i>
+        <br/>
+        Florida
+      </div>
+    
+  </div>
+</div>
+
+    <div id="algolia-search-modal" class="modal-container">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="close-button"><i class="fa fa-close"></i></span>
+      <a href="https://algolia.com" target="_blank" rel="noopener" class="searchby-algolia text-color-light link-unstyled">
+        <span class="searchby-algolia-text text-color-light text-small">by</span>
+        <img class="searchby-algolia-logo" src="https://www.algolia.com/static_assets/images/press/downloads/algolia-light.svg">
+      </a>
+      <i class="search-icon fa fa-search"></i>
+      <form id="algolia-search-form">
+        <input type="text" id="algolia-search-input" name="search"
+          class="form-control input--large search-input" placeholder="Search" />
+      </form>
+    </div>
+    <div class="modal-body">
+      <div class="no-result text-color-light text-center">no post found</div>
+      <div class="results">
+        
+        
+          <div class="media">
+            
+            <div class="media-body">
+              <a class="link-unstyled" href="/2018/07/getting-pi-with-monte-carlo-and-law-of-large-numbers-law-of-averages/">
+                <h3 class="media-heading">Getting Pi with Monte Carlo and Law of Large Numbers/Law of Averages</h3>
+              </a>
+              <span class="media-meta">
+                <span class="media-date text-small">
+                  Jul 7, 2018
+                </span>
+              </span>
+              <div class="media-content hide-xs font-merryweather">Making BetsBeing around sports and specifically sports betting I often see what many people call the Gambler’s fallacy. A common example of this is given by the following thought experiment:
+Say somone flips a coin 99 times all landing on heads, but says the coin is fair. Then asks what are the odds of getting tails on my next toss?
+Commiting the Gambler’s fallacy would be to say that it is more likely to land tails because it is due.</div>
+            </div>
+            <div style="clear:both;"></div>
+            <hr>
+          </div>
+        
+          <div class="media">
+            
+            <div class="media-body">
+              <a class="link-unstyled" href="/2018/04/pga-analysis/">
+                <h3 class="media-heading">PGA Analysis</h3>
+              </a>
+              <span class="media-meta">
+                <span class="media-date text-small">
+                  Apr 4, 2018
+                </span>
+              </span>
+              <div class="media-content hide-xs font-merryweather">Do PGA Golfers Preform Better in Different Regions or Rounds?Many times I hear either on TV or through friends that X golfer preforms better in round 4 or that X golfer seems to play better in the south. Intuitively I can see the case for both, some golfers may preform better on a given round due to their mindset. It is even easier to understand that players may play better in a given region, due to being in an area they are comfortable with or grew up and where they are more familiar with the typical layouts of courses or the grass of the course so lets look into it.</div>
+            </div>
+            <div style="clear:both;"></div>
+            <hr>
+          </div>
+        
+          <div class="media">
+            
+            <div class="media-body">
+              <a class="link-unstyled" href="/2017/08/nfl-finally-an-api/">
+                <h3 class="media-heading">NFL finally an API</h3>
+              </a>
+              <span class="media-meta">
+                <span class="media-date text-small">
+                  Aug 8, 2017
+                </span>
+              </span>
+              <div class="media-content hide-xs font-merryweather">Football is backThe best time of the year is finally here and we finally get to watch football every weekend again.
+In previous cases getting data was one of the biggest challenges for example in golf we had to scrape multiple sites for what data we wanted. However, maybe because the NFL is more popular it is more streamlined with data. Their are many more articles and pages developed to NFL analytics and there even exists a nice handy R NFL scraper cleverly named nflscrapR.</div>
+            </div>
+            <div style="clear:both;"></div>
+            <hr>
+          </div>
+        
+          <div class="media">
+            
+            <div class="media-body">
+              <a class="link-unstyled" href="/2017/08/overwatch-player-aggregated-stats/">
+                <h3 class="media-heading">Overwatch Player Aggregated Stats</h3>
+              </a>
+              <span class="media-meta">
+                <span class="media-date text-small">
+                  Aug 8, 2017
+                </span>
+              </span>
+              <div class="media-content hide-xs font-merryweather">In my free time I spend much of my time playing Overwatch or trying to learn the game. I really enjoy the game and looked into how I could get some stats to find improvements in my game and maybe others as well. There are and were a few problems that I encountered when doing some research on this topic.
+Major IssuesThe APIs that were available were mediocreThe stats available are agregrated vice individual stats for each gameNo easy way that I know of to get lots of player’s statsThe first issue I was able to solve by creating a scraper.</div>
+            </div>
+            <div style="clear:both;"></div>
+            <hr>
+          </div>
+        
+          <div class="media">
+            
+            <div class="media-body">
+              <a class="link-unstyled" href="/2017/08/creating-golf-scores-database/">
+                <h3 class="media-heading">Creating Golf Scores Database</h3>
+              </a>
+              <span class="media-meta">
+                <span class="media-date text-small">
+                  Aug 8, 2017
+                </span>
+              </span>
+              <div class="media-content hide-xs font-merryweather">The goal of this post is to create a database with all the scores recorded on golf tours. ESPN holds all the scorecards of players for each tournament dating back to 2001.
+We are going to start out by exploring around the ESPN website to find out how the data is stored and a way to scrape the data into R and then we are going to export this big data to SQL.</div>
+            </div>
+            <div style="clear:both;"></div>
+            <hr>
+          </div>
+        
+          <div class="media">
+            
+            <div class="media-body">
+              <a class="link-unstyled" href="/2017/07/scraping-pga-site/">
+                <h3 class="media-heading">Scraping PGA Site</h3>
+              </a>
+              <span class="media-meta">
+                <span class="media-date text-small">
+                  Jul 7, 2017
+                </span>
+              </span>
+              <div class="media-content hide-xs font-merryweather">To begin we want to use the json data from the PGA tour website. After doing some investigation into the PGA tour website, there are both pros and cons of using it for scraping.
+From what I have found we will only be able to get shot data from 2014 and beyond. This will contain any data we would want but only goes back to 2014, before 2014 there isn’t even data for simple scorecards for players.</div>
+            </div>
+            <div style="clear:both;"></div>
+            <hr>
+          </div>
+        
+          <div class="media">
+            
+            <div class="media-body">
+              <a class="link-unstyled" href="/2017/07/the-hole-cloud/">
+                <h3 class="media-heading">The Hole Cloud</h3>
+              </a>
+              <span class="media-meta">
+                <span class="media-date text-small">
+                  Jul 7, 2017
+                </span>
+              </span>
+              <div class="media-content hide-xs font-merryweather">In this post I will create word clouds to help determine what may or may not be important in predicting PGA golfers performance. I will start with gathering data from the PGA tour website.
+
+In this example I will be using descriptions from TPC Sawgrass golf course which hosts the Players Championship every year and is one of the most iconic course in the game. The hole descriptions in website format can be found here.</div>
+            </div>
+            <div style="clear:both;"></div>
+            <hr>
+          </div>
+        
+      </div>
+    </div>
+    <div class="modal-footer">
+      <p class="results-count text-medium"
+         data-message-zero="no post found"
+         data-message-one="1 post found"
+         data-message-other="{n} posts found">
+         7 posts found
+      </p>
+    </div>
+  </div>
+</div>
+    
+  
+    
+    <div id="cover" style="background-image:url('http://res.cloudinary.com/gharv/image/upload/v1501069243/cover2_om1zcy.jpg');"></div>
+  
+
+
+    
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.2.4/jquery.min.js" integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44=" crossorigin="anonymous"></script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/2.1.7/js/jquery.fancybox.min.js" integrity="sha256-GEAnjcTqVP+vBp3SSc8bEDQqvWAZMiHyUSIorrWwH50=" crossorigin="anonymous"></script>
+
+
+<script src="/js/script-qi9wbxp2ya2j6p7wx1i6tgavftewndznf4v0hy2gvivk1rxgc3lm7njqb6bz.min.js"></script>
+
+
+
+
+  
+    
+      <script>
+        var disqus_config = function () {
+          this.page.url = '\/2017\/07\/scraping-pga-site\/';
+          
+            this.page.identifier = '\/2017\/07\/scraping-pga-site\/'
+          
+        };
+        (function() {
+          
+          
+          if (window.location.hostname == "localhost") {
+            return;
+          }
+          var d = document, s = d.createElement('script');
+          var disqus_shortname = 'gharv-github-io';
+          s.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+
+          s.setAttribute('data-timestamp', +new Date());
+          (d.head || d.body).appendChild(s);
+        })();
+      </script>
+    
+  
+
+
+
+    
+  </body>
+</html>
+

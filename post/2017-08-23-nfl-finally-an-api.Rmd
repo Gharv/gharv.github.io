@@ -1,0 +1,89 @@
+---
+title: NFL finally an API
+author: ~
+date: '2017-08-23'
+slug: nfl-finally-an-api
+categories:
+  - Football
+tags:
+  - NFL
+  - API
+  - nflscrapR
+  - EPA
+thumbnailImagePosition: left
+thumbnailImage: "http://res.cloudinary.com/gharv/image/upload/c_scale,w_600/v1504134471/nfl-analytics_ojgjhu.jpg"
+coverImage: "http://res.cloudinary.com/gharv/image/upload/v1504134471/nfl-analytics_ojgjhu.jpg"
+---
+
+# Football is back  
+
+The best time of the year is finally here and we finally get to watch football every weekend again. 
+
+In previous cases getting data was one of the biggest challenges for example in golf we had to scrape multiple sites for what data we wanted. However, maybe because the NFL is more popular it is more streamlined with data. Their are many more articles and pages developed to NFL analytics and there even exists a nice handy R NFL scraper cleverly named [nflscrapR](https://github.com/maksimhorowitz/nflscrapR).  
+
+![](http://res.cloudinary.com/gharv/image/upload/c_crop,g_xy_center,h_216,w_1000,x_501,y_255/v1504134471/nflscrapR_image_lr06vs.png)
+
+They get their data directly from the NFL API and they even add some of their own metrics namely *Win_Prob* which they use to derive *EPA* (Expected Points Added) for each play. These are some great analytics and is very similar to the Strokes Gained model from PGA. This package only has data back to 2009 but still that is 7 years of data and should be decent enough. So enough with the introduction now we want to use nflscrapR to collect play by play data and do some sort of analytics.  
+
+***
+
+A terrific example is presented on the github website for the nflscrapR package and will be shown here.  
+
+
+```{r eval = FALSE}
+# Loading the data with season_play_by_play function: (Note the
+# season_play_by_play function takes a few minutes to run)
+
+library(nflscrapR)
+
+pbp_2009 <- season_play_by_play(2009)
+pbp_2010 <- season_play_by_play(2010)
+pbp_2011 <- season_play_by_play(2011)
+pbp_2012 <- season_play_by_play(2012)
+pbp_2013 <- season_play_by_play(2013)
+pbp_2014 <- season_play_by_play(2014)
+pbp_2015 <- season_play_by_play(2015)
+pbp_2016 <- season_play_by_play(2016)
+
+
+library(tidyverse)
+
+pbp_data <- bind_rows(pbp_2009, pbp_2010, pbp_2011, pbp_2012, pbp_2013, pbp_2014, 
+    pbp_2015, pbp_2016)
+
+# Now filter down to only passing attempts, group by the season and passer,
+# then calculate the number of passing attempts, total expected points added
+# (EPA), EPA per attempt, then finally filter to only those with at least 50
+# pass attempts:
+
+passing_stats <- pbp_data %>% filter(PassAttempt == 1 & PlayType != "No Play" & 
+    !is.na(Passer)) %>% group_by(Season, Passer) %>% summarise(Attempts = n(), 
+    Total_EPA = sum(EPA, na.rm = TRUE), EPA_per_Att = Total_EPA/Attempts) %>% 
+    filter(Attempts >= 50)
+```
+
+```{r echo = FALSE}
+load("passing_stats")
+```
+
+Now that we have the stats that we want to look at we can plot the data.  
+
+```{r}
+# Using the ggjoy package (install with the commented out code below) can
+# compare the EPA per Pass Attempt for each NFL season:
+library(ggplot2)
+# install.packages('ggjoy') ## creates the overlaying line plots
+library(ggjoy)
+
+ggplot(passing_stats, aes(x = EPA_per_Att, y = as.factor(Season))) + geom_joy(scale = 3, 
+    rel_min_height = 0.01) + theme_joy() + ylab("Season") + xlab("EPA per Pass Attempt") + 
+    scale_y_discrete(expand = c(0.01, 0)) + scale_x_continuous(expand = c(0.01, 
+    0)) + ggtitle("The Shifting Distribution of EPA per Pass Attempt") + theme(plot.title = element_text(hjust = 0.5, 
+    size = 16), axis.title = element_text(size = 16), axis.text = element_text(size = 16))
+```
+
+
+
+
+So from this graph we are able to see that throughout the years the EPA seems to be increasing meaning that QBs and offenses are either getting more efficient at passing, or defenses are becoming less able to defend against the pass. This could be due to factors other then players on either side changing or coaches making different decisions. One explanation could be the changing of the rules to favor offenses more throughout these years.
+

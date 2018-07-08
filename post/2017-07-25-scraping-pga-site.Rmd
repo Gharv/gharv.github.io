@@ -1,0 +1,186 @@
+---
+title: Scraping PGA Site
+author: ~
+date: '2017-07-25'
+slug: scraping-pga-site
+categories: ["Golf"]
+tags: ["R", "golf", "scraping", "shot data", "PGA"]
+thumbnailImagePosition: top
+thumbnailImage: "http://res.cloudinary.com/gharv/image/upload/v1501073281/pga_tour_banner_b1ap0f.png"
+coverImage: "http://res.cloudinary.com/gharv/image/upload/v1504197764/Nicklaus_13th-2_psqkvu.jpg"
+---
+<!--more-->
+
+To begin we want to use the json data from the [PGA tour website](http://www.pgatour.com/). After doing some investigation into the PGA tour website, there are both pros and cons of using it for scraping.  
+
+From what I have found we will only be able to get **shot data** from 2014 and beyond. This will contain any data we would want but only goes back to 2014, before 2014 there isn't even data for simple **scorecards** for players. The only data available is each players round scores. Another issue is that the four majors of the year also do not have shot data.
+
+I will briefly cover how I came to this conclusion and in the next post we will look into another website for **scorecard data** before 2014 (maybe ESPN). The steps we will go through are :  
+
+1. Look into [PGA tour website](http://www.pgatour.com/) layout to find their data
+2. Build a script to scrape the data
+3. Write functions so it can be easily ported for multiple tournaments and future tournaments  
+
+## Finding the Data
+
+This part is can be quick or take very long, but the more you get used to exploring data the quicker you become at finding what you need in a nice format. Any website that store data typically store them in **JSON** or **XML** files. This is what we are going to look for.  
+
+You might be asking, well many sites have external APIs, why can't we just use that? The issue with external facing APIs is unless their is a pay wall they do not have a large incentive to keep the API up to date. This is why I prefer going directly to the website and finding the files called by the website. If an issue occurs with these files or need to be updated, everyone will notice and there is more incentive to keep it updated.  
+
+Using chrome we are going to inspect a leader board page and look into the network section to find all files used for the webpage. Then we will filter for **.json** files.  
+
+I am going to pick out an arbitrary tournament, all we need to make sure is that play-by-play data is available. Going to use the [2017 Travelers Championship](http://www.pgatour.com/competition/2017/travelers-championship/leaderboard.html). As we can see play-by-play data is available.  
+
+-----
+
+![](http://res.cloudinary.com/gharv/image/upload/v1501073836/showing_pbp_zrdks3.png)
+
+Now we inspect the page source by right clicking anywhere on the webpage and selecting *Inspect*. Then we go to the Network tab and reload the page. We have to reload because some files load before we started the Inspect. Once everything is loaded then we can stop recording the network log and just type **.json** in the filter search box. Make sure we open a player and look at his play-by-play data. I am going to be using Jordan Spieth. 
+
+-----
+
+![](http://res.cloudinary.com/gharv/image/upload/v1501074121/showing_json_pga_qtwblt.png)
+
+After going through this data we find that there are a few important JSON files such as : 
+
+* setup.json
+* player_stats.json
+* leaderboard-v2.json
+* 34046.json
+
+The most important one here is the **34046.json** which contains shot link data for Jordan Spieth. This is data can not be found anywhere else unless you have access to shot link data specifically which requires applying for shot link data and is only available to university researchers.  
+
+So looking at the **34046.json** file we see that the URL before this file is https://statdata.pgatour.com/r/034/scorecards/. This shows that the tourn_id is "034". So now we need to build a function to extract the play-by-play data using this information.  
+
+Before we can do this however we need to collect all the players IDs so this will be the first function we create and we are going to use the **leaderboard-v2.json** file.  
+
+```{r, eval=FALSE}
+get_field <- function(tourn_id, year){
+  
+  require(jsonlite)
+  require(dplyr)
+  
+  url_seed <- "https://statdata.pgatour.com/r/"  
+  
+  url_field <- paste0(url_seed, tourn_id, "/", year, "/", "leaderboard-v2.json")
+  dat <- fromJSON(url_field)
+  field <- select(dat$leaderboard$players, player_id, player_bio)
+  field$tournament_name <- dat$leaderboard$tournament_name
+  field$tourn_id <- tourn_id
+  field$year <- year
+  return(field) 
+}
+```
+
+Now we have a function that gets all players and their *player_id* from the tournament we want. The next step we must undergo is creating a function to loop through all the players of a tournament and scraping their scorecard to get their play-by-play data.  
+
+```{r, eval=FALSE}
+get_pbp <- function(tourn_id, year){
+  require(dplyr)
+  require(RCurl)
+  require(jsonlite)
+  
+  url_seed<-"https://statdata.pgatour.com/r/"
+  
+  # create an empty data to store the results
+  df <- data.frame()
+  round_info_all <- data.frame()
+  
+  # retrieve the field for the tournament
+  
+  # loop over each player
+  field <- get_field(tourn_id, year)
+  for (i in 1:nrow(field)){
+    
+    url_scorecard <- paste0(url_seed, tourn_id, "/", year, "/scorecards/", 
+                            field$player_id[i], ".json")
+    
+    # check if the url exists for that player (some players are in the field but withdraw)
+    if (!RCurl::url.exists(url_scorecard)) next
+    
+    dat <- fromJSON(url_scorecard, simplifyDataFrame = TRUE)
+    
+    if (length(dat$p$rnds$n)==0) next
+    
+    # loop over the number of rounds
+    for (j in 1:length(dat$p$rnds$n)){ 
+      
+      if (length(dat$p$rnds$holes[[1]]) == 0) next
+      round_info <- dat$p$rnds$holes[[j]][,1:5]
+      round_info <- round_info %>% rename(hole_number = cNum, 
+                                          score = sc, 
+                                          par_for_day = pDay, 
+                                          par_for_tourn = pTot) %>% 
+        mutate(hole_number = as.numeric(hole_number),
+               score = as.numeric(score),
+               par_for_day = as.numeric(par_for_day, 
+                                        par_for_tourn = as.numeric(par_for_tourn)))
+      # add additional variables
+      round_info$round_number <- j
+      round_info$pid <- field$player_id[i]
+      
+      round_info$player_name <- paste(field$player_bio$first_name[i], field$player_bio$last_name[i])
+      
+      round_info$tourn_id <- tourn_id
+      round_info_all <- rbind(round_info_all, round_info)
+      
+      
+      if (length(dat$p$rnds$holes[[j]]$shots) == 0 | 
+          length(dat$p$rnds$holes[[j]]$shots[[1]]) == 1 |
+          length(dat$p$rnds$holes[[j]]$shots[[1]]) == 0) next 
+      
+      shots <-do.call(rbind, dat$p$rnds$holes[[j]]$shots)
+      
+      shots_length <- sapply(dat$p$rnds$holes[[j]]$shots, nrow)
+      
+      shots <- shots %>% mutate(round_hole_num = as.numeric(n), putt = as.numeric(putt), 
+                                dist = as.numeric(dist), x = as.numeric(x),
+                                y = as.numeric(y), z = as.numeric(z)) %>% 
+        rename(shot_num = n, putt_num = putt, 
+               distance = dist, x_loc = x, y_loc = y, z_loc = z,
+               type = t, dist_left = left, tee_shot = tee)
+      
+      shots$hole_number <- rep(round_info$hole_number, times = shots_length)
+      shots <- shots %>% select(-pid)
+      
+      pbp <- shots %>% left_join(round_info, by = c("hole_number"))
+      
+      df <- rbind(df, pbp)
+    }
+    
+    Sys.sleep(2) # pause system for 2 seconds
+  }
+  
+  if (dim(df)[1] == 0) return(list(NULL, tbl_df(round_info_all)))
+  
+  df$year <- year
+  df$tournament_name <- field$tournament_name[1]
+  
+  # missing putts to zero
+  df$putt_num[is.na(df$putt_num)] <- 0
+  
+  # reorder the variables
+  df <- df %>%  select(pid, player_name, tourn_id, tournament_name,
+                       round_number, hole_number, round_hole_num, shot_num,
+                       putt_num, type, prv, tee_shot, cup, from, to, asc,
+                       distance, dist_left, x_loc, y_loc, z_loc, club, con, shotText,
+                       score, par_for_day, par_for_tourn) %>% rename(shot_text = shotText)
+  
+  return(list(tbl_df(df), tbl_df(round_info_all)))
+}
+```
+
+Once we run this *get_pbp* function we will have a list of two data frames, the first contains all **shot data** while the second contains **scorecard data**. I am just going to name this newly created variable *travelers* after the tournament name.
+
+```{r, eval=FALSE}
+travelers <- get_pbp("034", 2017)
+
+# a little sample
+travelers[[1]] # shows 10 observations and all variables
+library(knitr)
+kable(head(select(travelers[[1]], player_name, hole_number, shot_text)))
+```
+
+![](http://res.cloudinary.com/gharv/image/upload/v1501618122/sample_travelers_get_pbp_markky.png)
+
+Now we have all the information we would want from the PGA tour website and will use this in latter posts to actually start running some analytics.

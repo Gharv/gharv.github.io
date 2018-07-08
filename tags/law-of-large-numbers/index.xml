@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Law of Large Numbers on Sportnomics</title>
+    <link>/tags/law-of-large-numbers/</link>
+    <description>Recent content in Law of Large Numbers on Sportnomics</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Fri, 06 Jul 2018 00:00:00 +0000</lastBuildDate>
+    
+	<atom:link href="/tags/law-of-large-numbers/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Getting Pi with Monte Carlo and Law of Large Numbers/Law of Averages</title>
+      <link>/2018/07/getting-pi-with-monte-carlo-and-law-of-large-numbers-law-of-averages/</link>
+      <pubDate>Fri, 06 Jul 2018 00:00:00 +0000</pubDate>
+      
+      <guid>/2018/07/getting-pi-with-monte-carlo-and-law-of-large-numbers-law-of-averages/</guid>
+      <description>Making BetsBeing around sports and specifically sports betting I often see what many people call the Gambler’s fallacy. A common example of this is given by the following thought experiment:
+Say somone flips a coin 99 times all landing on heads, but says the coin is fair. Then asks what are the odds of getting tails on my next toss?
+Commiting the Gambler’s fallacy would be to say that it is more likely to land tails because it is due.</description>
+    </item>
+    
+  </channel>
+</rss>

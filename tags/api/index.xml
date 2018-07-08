@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Api on Sportnomics</title>
+    <link>/tags/api/</link>
+    <description>Recent content in Api on Sportnomics</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Wed, 23 Aug 2017 00:00:00 +0000</lastBuildDate>
+    
+	<atom:link href="/tags/api/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>NFL finally an API</title>
+      <link>/2017/08/nfl-finally-an-api/</link>
+      <pubDate>Wed, 23 Aug 2017 00:00:00 +0000</pubDate>
+      
+      <guid>/2017/08/nfl-finally-an-api/</guid>
+      <description>Football is backThe best time of the year is finally here and we finally get to watch football every weekend again.
+In previous cases getting data was one of the biggest challenges for example in golf we had to scrape multiple sites for what data we wanted. However, maybe because the NFL is more popular it is more streamlined with data. Their are many more articles and pages developed to NFL analytics and there even exists a nice handy R NFL scraper cleverly named nflscrapR.</description>
+    </item>
+    
+  </channel>
+</rss>

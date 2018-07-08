@@ -1,0 +1,723 @@
+
+
+  
+    
+  
+
+
+  
+
+
+
+
+  
+
+
+  
+
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="generator" content="Hugo 0.42.1 with theme Tranquilpeak 0.4.3-BETA">
+    <title>Creating Golf Scores Database</title>
+    <meta name="author" content="Greg Harvey">
+    <meta name="keywords" content=", r, data, analytics, sports, economics, golf, football">
+
+    <link rel="icon" href="http://res.cloudinary.com/gharv/image/upload/v1501075122/money_golf_ball_m6oucp.png">
+    
+
+    
+    <meta name="description" content="The goal of this post is to create a database with all the scores recorded on golf tours. ESPN holds all the scorecards of players for each tournament dating back to 2001.
+We are going to start out by exploring around the ESPN website to find out how the data is stored and a way to scrape the data into R and then we are going to export this big data to SQL.">
+    <meta property="og:description" content="The goal of this post is to create a database with all the scores recorded on golf tours. ESPN holds all the scorecards of players for each tournament dating back to 2001.
+We are going to start out by exploring around the ESPN website to find out how the data is stored and a way to scrape the data into R and then we are going to export this big data to SQL.">
+    <meta property="og:type" content="blog">
+    <meta property="og:title" content="Creating Golf Scores Database">
+    <meta property="og:url" content="/2017/08/creating-golf-scores-database/">
+    <meta property="og:site_name" content="Sportnomics">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="Sportnomics">
+    <meta name="twitter:description" content="The goal of this post is to create a database with all the scores recorded on golf tours. ESPN holds all the scorecards of players for each tournament dating back to 2001.
+We are going to start out by exploring around the ESPN website to find out how the data is stored and a way to scrape the data into R and then we are going to export this big data to SQL.">
+    
+    
+
+    
+    
+
+    
+      <meta property="og:image" content="//www.gravatar.com/avatar/d03bc8e23b9b38d63432dc7973514ec4?s=640">
+    
+
+    
+      <meta property="og:image" content="http://res.cloudinary.com/gharv/image/upload/v1501617181/espn_golf_pic_nrgbkd.jpg">
+    
+    
+    
+
+    
+
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" integrity="sha256-eZrrJcwDc/3uDhsdt61sL2oOBY362qM3lon1gyExkL0=" crossorigin="anonymous" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/2.1.4/jquery.fancybox.min.css" integrity="sha256-vuXZ9LGmmwtjqFX1F+EKin1ThZMub58gKULUyf0qECk=" crossorigin="anonymous" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/2.1.4/helpers/jquery.fancybox-thumbs.min.css" integrity="sha256-SEa4XYAHihTcEP1f5gARTB2K26Uk8PsndQYHQC1f4jU=" crossorigin="anonymous" />
+    
+    
+    <link rel="stylesheet" href="/css/style-jsjn0006wyhpyzivf6yceb31gvpjatbcs3qzjvlumobfnugccvobqwxnnaj8.min.css" />
+    
+    
+
+    
+      
+    
+    
+  </head>
+
+  <body>
+    <div id="blog">
+      <header id="header" data-behavior="5">
+  <i id="btn-open-sidebar" class="fa fa-lg fa-bars"></i>
+  <div class="header-title">
+    <a class="header-title-link" href="/">Sportnomics</a>
+  </div>
+  
+    
+      <a class="header-right-picture "
+         href="/#about">
+    
+    
+    
+      
+        <img class="header-picture" src="//www.gravatar.com/avatar/d03bc8e23b9b38d63432dc7973514ec4?s=90" alt="Author&#39;s picture" />
+      
+    
+    </a>
+  
+</header>
+
+      <nav id="sidebar" data-behavior="5">
+  <div class="sidebar-container">
+    
+      <div class="sidebar-profile">
+        <a href="/#about">
+          <img class="sidebar-profile-picture" src="//www.gravatar.com/avatar/d03bc8e23b9b38d63432dc7973514ec4?s=110" alt="Author&#39;s picture" />
+        </a>
+        <h4 class="sidebar-profile-name">Greg Harvey</h4>
+        
+          <h5 class="sidebar-profile-bio">Statistics student interested in analytics for sports and economics</h5>
+        
+      </div>
+    
+    <ul class="sidebar-buttons">
+      
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-home"></i>
+      
+      <span class="sidebar-button-desc">Home</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="/categories">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-list-ul"></i>
+      
+      <span class="sidebar-button-desc">Categories</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="/tags">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-tags"></i>
+      
+      <span class="sidebar-button-desc">Tags</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="/archives">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-archive"></i>
+      
+      <span class="sidebar-button-desc">Archives</span>
+    </a>
+  </li>
+
+
+    </ul>
+    <ul class="sidebar-buttons">
+      
+
+    </ul>
+    <ul class="sidebar-buttons">
+      
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="/categories/football">
+    
+      <i class="sidebar-button-icon fa fa-facebook "></i>
+      
+      <span class="sidebar-button-desc">Football</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="/categories/golf">
+    
+      <i class="sidebar-button-icon fa fa-ravelry "></i>
+      
+      <span class="sidebar-button-desc">Golf</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="/categories/economics">
+    
+      <i class="sidebar-button-icon fa fa-money "></i>
+      
+      <span class="sidebar-button-desc">Economics</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="/categories/esports">
+    
+      <i class="sidebar-button-icon fa fa-twitch "></i>
+      
+      <span class="sidebar-button-desc">eSports</span>
+    </a>
+  </li>
+
+
+    </ul>
+  </div>
+</nav>
+
+      
+
+      <div id="main" data-behavior="5"
+        class="
+               hasCoverMetaIn
+               ">
+        <article class="post" itemscope itemType="http://schema.org/BlogPosting">
+          
+          
+            <div class="post-header main-content-wrap text-left">
+  
+    <h1 class="post-title" itemprop="headline">
+      Creating Golf Scores Database
+    </h1>
+  
+  
+  <div class="postShorten-meta post-meta">
+    
+      <time itemprop="datePublished" datetime="2017-08-01T00:00:00Z">
+        
+  August 1, 2017
+
+      </time>
+    
+    
+  
+  
+    <span>in</span>
+    
+      <a class="category-link" href="/categories/golf">Golf</a>
+    
+  
+
+  </div>
+
+</div>
+          
+          <div class="post-content markdown" itemprop="articleBody">
+            <div class="main-content-wrap">
+              <p>The goal of this post is to create a database with all the <strong>scores</strong> recorded on golf tours. ESPN holds all the scorecards of players for each tournament dating back to 2001.</p>
+<p>We are going to start out by exploring around the ESPN website to find out how the data is stored and a way to scrape the data into R and then we are going to export this big data to SQL.</p>
+<!--more-->
+<p>After poking around I was able to find the ESPN API URL in the picture below, which we can use to write a scraping script.<br />
+<img src="http://res.cloudinary.com/gharv/image/upload/v1501615238/espn_golf_scorecard_b9a6gs.png" /></p>
+<p>The ESPN golf tournaments increase in sequential order from 2001, so the tournament IDs start out at 1 in 2001 and continue on. At this date the last tournament is 2714 which is the <a href="http://www.espn.com/golf/leaderboard?tournamentId=2714">2017 RBC Canadian Open</a>. So we just need to make a for loop going through 1 to 2714 to get all the tournaments. We want to get each players ID and their score for each hole. This will take a couple different loops but can be done. The code below can be used to create a list of all tournaments with all players and with all their scores for each hole. It will take a very long time to run because it is going over 16 years of data.</p>
+<pre class="r"><code>library(rvest)
+library(RCurl)
+library(dplyr)
+
+url_seed &lt;- &#39;http://site.api.espn.com/apis/site/v2/sports/golf/pga/leaderboard/&#39;
+tourn_scores &lt;- list()    # initalizing lists
+tourn_players &lt;- list()
+
+for (i in 1:2730) {
+  #tourn_url &lt;- paste0(url_seed, &#39;players?event=&#39;, i)
+  player_scores &lt;- list()
+  
+  
+  tourn_url &lt;- paste0(&quot;http://www.espn.com/golf/leaderboard?tournamentId=&quot;, i)
+  if (!RCurl::url.exists(tourn_url)) next
+  tourn_html &lt;- tourn_url %&gt;% read_html()
+  tourn_text &lt;- tourn_url %&gt;% read_html() %&gt;% html_nodes(&#39;h2&#39;)
+  
+  if (length(tourn_text) != 3) next
+  
+  tourn_tbody &lt;- tourn_html %&gt;% html_nodes(&quot;tbody&quot;)
+  
+  
+  tourn_players[[i]] &lt;- sub(&quot;^.*model-(\\d+).*&quot;, &quot;\\1&quot;, tourn_tbody)    # finds the first numbers (which is the player_id) and saves to a list
+  
+  if(length(tourn_players[[i]]) == 0) next    # filters out tournaments that have no data
+  
+  for (j in 1:length(tourn_players[[i]])) {    #tourn$leaderboard$id is each players ID
+
+    player_url &lt;- paste0(url_seed, i, &#39;/playersummary?player=&#39;, tourn_players[[i]][j])
+    
+    if (!RCurl::url.exists(player_url)) next
+    
+    player &lt;- fromJSON(player_url)
+    
+    player_score &lt;- player$rounds$linescores    # returns a list of the rounds played and scores of each hole
+    
+    player_score_edit &lt;- list()
+    for (k in 1:length(player_score)) {    # editing list to reduce size to only necessary variables eg: score, hole num, par
+      if (length(player_score[[k]]) != 0) {    # skips over rounds that were not accounted for, they will be set to NULL
+        player_score_edit[[k]] &lt;- select(player_score[[k]], value, period, par)
+      }
+    }
+
+    player_scores[[tourn_players[[i]][j]]] &lt;- player_score_edit
+  }
+
+  tourn_scores[[i]] &lt;- player_scores
+
+  Sys.sleep(2)
+}</code></pre>
+<p>Once this is run we will have a very long list containing all the scoring data we can get our hands on.</p>
+<p>Unfortunately we can not just export this easily to SQL, we first need to make all this information that is contained inside multiple lists and multiple data frames. We will convert all of this into a single data frame and also make new columns to account for labeling the data with both player IDs and tournament IDs so that we can easily call the data from SQL.</p>
+<p>In the code below we use a couple cbinds to add the player and tournament IDs to each row. Then we add all the rows together to create a single data frame that contains all scoring data. At the end we also export this newly created data frame to MySQL using RMySQL.</p>
+<pre class="r"><code>tourn_df &lt;- data.table()
+for(i in 1:2730){
+  if(length(tourn_scores[[i]]) == 0) next
+  tourn_df_temp2 &lt;- data.table()
+  for(j in 1:length(tourn_scores[[i]])){
+    if(length(tourn_scores[[i]][[j]]) == 0) next
+    tourn_df_temp &lt;- data.table()
+    tourn_df_temp &lt;- as.data.frame(data.table::rbindlist(tourn_scores[[i]][[j]]))
+    tourn_df_temp &lt;- cbind(tourn_df_temp, pid = names(tourn_scores[[i]][j]))
+    tourn_df_temp2 &lt;- rbind(tourn_df_temp2, tourn_df_temp)
+  }
+  if(length(tourn_df_temp2) == 0) next
+  tourn_df_temp2 &lt;- cbind(tourn_df_temp2, tid = as.numeric(i))
+  tourn_df &lt;- bind_rows(tourn_df, tourn_df_temp2)    # using bind_rows because it will be a little quicker
+}
+
+library(RMySQL)
+con_sql &lt;- dbConnect(RMySQL::MySQL(), password = &quot;ticklemehomo&quot;, dbname = &quot;golf_espn&quot;) # reference : (https://www.youtube.com/watch?v=5RCPM_w3t-M)
+dbWriteTable(con_sql, &quot;Scores&quot;, tourn_df)</code></pre>
+<p>I am not going to run these two scripts because it will create a large file. The list created was just over 600 Mbs and the data frame had over 8.5 million observations. Next we will need to create another database that contains all the player and tournament names along with their IDs so we can reference them when working with SQL to making calling data easier by referencing tournaments and players by their name instead of their IDs.</p>
+
+              
+            </div>
+          </div>
+          <div id="post-footer" class="post-footer main-content-wrap">
+            
+              
+                
+                
+                  <div class="post-footer-tags">
+                    <span class="text-color-light text-small">TAGGED IN</span><br/>
+                    
+  <a class="tag tag--primary tag--small" href="/tags/r/">R</a>
+
+  <a class="tag tag--primary tag--small" href="/tags/golf/">golf</a>
+
+  <a class="tag tag--primary tag--small" href="/tags/scraping/">scraping</a>
+
+  <a class="tag tag--primary tag--small" href="/tags/scores/">scores</a>
+
+  <a class="tag tag--primary tag--small" href="/tags/pga/">PGA</a>
+
+  <a class="tag tag--primary tag--small" href="/tags/database/">database</a>
+
+  <a class="tag tag--primary tag--small" href="/tags/sql/">SQL</a>
+
+                  </div>
+                
+              
+            
+            
+  <div class="post-actions-wrap">
+      <nav >
+        <ul class="post-actions post-action-nav">
+          
+            <li class="post-action">
+              
+                <a class="post-action-btn btn btn--default tooltip--top" href="/2017/08/overwatch-player-aggregated-stats/" data-tooltip="Overwatch Player Aggregated Stats">
+              
+                  <i class="fa fa-angle-left"></i>
+                  <span class="hide-xs hide-sm text-small icon-ml">NEXT</span>
+                </a>
+            </li>
+            <li class="post-action">
+              
+                <a class="post-action-btn btn btn--default tooltip--top" href="/2017/07/scraping-pga-site/" data-tooltip="Scraping PGA Site">
+              
+                  <span class="hide-xs hide-sm text-small icon-mr">PREVIOUS</span>
+                  <i class="fa fa-angle-right"></i>
+                </a>
+            </li>
+          
+        </ul>
+      </nav>
+    <ul class="post-actions post-action-share" >
+      
+        <li class="post-action hide-lg hide-md hide-sm">
+          <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions">
+            <i class="fa fa-share-alt"></i>
+          </a>
+        </li>
+        
+      
+      
+        <li class="post-action">
+          <a class="post-action-btn btn btn--default" href="#disqus_thread">
+            <i class="fa fa-comment-o"></i>
+          </a>
+        </li>
+      
+      <li class="post-action">
+        
+          <a class="post-action-btn btn btn--default" href="#">
+        
+          <i class="fa fa-list"></i>
+        </a>
+      </li>
+    </ul>
+  </div>
+
+
+            
+              
+                <div id="disqus_thread">
+  <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+              
+            
+          </div>
+        </article>
+        <footer id="footer" class="main-content-wrap">
+  <span class="copyrights">
+    &copy; 2018 Greg Harvey. All Rights Reserved
+  </span>
+</footer>
+
+      </div>
+      <div id="bottom-bar" class="post-bottom-bar" data-behavior="5">
+        
+  <div class="post-actions-wrap">
+      <nav >
+        <ul class="post-actions post-action-nav">
+          
+            <li class="post-action">
+              
+                <a class="post-action-btn btn btn--default tooltip--top" href="/2017/08/overwatch-player-aggregated-stats/" data-tooltip="Overwatch Player Aggregated Stats">
+              
+                  <i class="fa fa-angle-left"></i>
+                  <span class="hide-xs hide-sm text-small icon-ml">NEXT</span>
+                </a>
+            </li>
+            <li class="post-action">
+              
+                <a class="post-action-btn btn btn--default tooltip--top" href="/2017/07/scraping-pga-site/" data-tooltip="Scraping PGA Site">
+              
+                  <span class="hide-xs hide-sm text-small icon-mr">PREVIOUS</span>
+                  <i class="fa fa-angle-right"></i>
+                </a>
+            </li>
+          
+        </ul>
+      </nav>
+    <ul class="post-actions post-action-share" >
+      
+        <li class="post-action hide-lg hide-md hide-sm">
+          <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions">
+            <i class="fa fa-share-alt"></i>
+          </a>
+        </li>
+        
+      
+      
+        <li class="post-action">
+          <a class="post-action-btn btn btn--default" href="#disqus_thread">
+            <i class="fa fa-comment-o"></i>
+          </a>
+        </li>
+      
+      <li class="post-action">
+        
+          <a class="post-action-btn btn btn--default" href="#">
+        
+          <i class="fa fa-list"></i>
+        </a>
+      </li>
+    </ul>
+  </div>
+
+
+      </div>
+      <div id="share-options-bar" class="share-options-bar" data-behavior="5">
+  <i id="btn-close-shareoptions" class="fa fa-close"></i>
+  <ul class="share-options">
+    
+  </ul>
+</div>
+<div id="share-options-mask" class="share-options-mask"></div>
+    </div>
+    
+    <div id="about">
+  <div id="about-card">
+    <div id="about-btn-close">
+      <i class="fa fa-remove"></i>
+    </div>
+    
+      <img id="about-card-picture" src="//www.gravatar.com/avatar/d03bc8e23b9b38d63432dc7973514ec4?s=110" alt="Author&#39;s picture" />
+    
+    <h4 id="about-card-name">Greg Harvey</h4>
+    
+      <div id="about-card-bio">Statistics student interested in analytics for sports and economics</div>
+    
+    
+      <div id="about-card-job">
+        <i class="fa fa-briefcase"></i>
+        <br/>
+        Student at UF
+      </div>
+    
+    
+      <div id="about-card-location">
+        <i class="fa fa-map-marker"></i>
+        <br/>
+        Florida
+      </div>
+    
+  </div>
+</div>
+
+    <div id="algolia-search-modal" class="modal-container">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="close-button"><i class="fa fa-close"></i></span>
+      <a href="https://algolia.com" target="_blank" rel="noopener" class="searchby-algolia text-color-light link-unstyled">
+        <span class="searchby-algolia-text text-color-light text-small">by</span>
+        <img class="searchby-algolia-logo" src="https://www.algolia.com/static_assets/images/press/downloads/algolia-light.svg">
+      </a>
+      <i class="search-icon fa fa-search"></i>
+      <form id="algolia-search-form">
+        <input type="text" id="algolia-search-input" name="search"
+          class="form-control input--large search-input" placeholder="Search" />
+      </form>
+    </div>
+    <div class="modal-body">
+      <div class="no-result text-color-light text-center">no post found</div>
+      <div class="results">
+        
+        
+          <div class="media">
+            
+            <div class="media-body">
+              <a class="link-unstyled" href="/2018/07/getting-pi-with-monte-carlo-and-law-of-large-numbers-law-of-averages/">
+                <h3 class="media-heading">Getting Pi with Monte Carlo and Law of Large Numbers/Law of Averages</h3>
+              </a>
+              <span class="media-meta">
+                <span class="media-date text-small">
+                  Jul 7, 2018
+                </span>
+              </span>
+              <div class="media-content hide-xs font-merryweather">Making BetsBeing around sports and specifically sports betting I often see what many people call the Gambler’s fallacy. A common example of this is given by the following thought experiment:
+Say somone flips a coin 99 times all landing on heads, but says the coin is fair. Then asks what are the odds of getting tails on my next toss?
+Commiting the Gambler’s fallacy would be to say that it is more likely to land tails because it is due.</div>
+            </div>
+            <div style="clear:both;"></div>
+            <hr>
+          </div>
+        
+          <div class="media">
+            
+            <div class="media-body">
+              <a class="link-unstyled" href="/2018/04/pga-analysis/">
+                <h3 class="media-heading">PGA Analysis</h3>
+              </a>
+              <span class="media-meta">
+                <span class="media-date text-small">
+                  Apr 4, 2018
+                </span>
+              </span>
+              <div class="media-content hide-xs font-merryweather">Do PGA Golfers Preform Better in Different Regions or Rounds?Many times I hear either on TV or through friends that X golfer preforms better in round 4 or that X golfer seems to play better in the south. Intuitively I can see the case for both, some golfers may preform better on a given round due to their mindset. It is even easier to understand that players may play better in a given region, due to being in an area they are comfortable with or grew up and where they are more familiar with the typical layouts of courses or the grass of the course so lets look into it.</div>
+            </div>
+            <div style="clear:both;"></div>
+            <hr>
+          </div>
+        
+          <div class="media">
+            
+            <div class="media-body">
+              <a class="link-unstyled" href="/2017/08/nfl-finally-an-api/">
+                <h3 class="media-heading">NFL finally an API</h3>
+              </a>
+              <span class="media-meta">
+                <span class="media-date text-small">
+                  Aug 8, 2017
+                </span>
+              </span>
+              <div class="media-content hide-xs font-merryweather">Football is backThe best time of the year is finally here and we finally get to watch football every weekend again.
+In previous cases getting data was one of the biggest challenges for example in golf we had to scrape multiple sites for what data we wanted. However, maybe because the NFL is more popular it is more streamlined with data. Their are many more articles and pages developed to NFL analytics and there even exists a nice handy R NFL scraper cleverly named nflscrapR.</div>
+            </div>
+            <div style="clear:both;"></div>
+            <hr>
+          </div>
+        
+          <div class="media">
+            
+            <div class="media-body">
+              <a class="link-unstyled" href="/2017/08/overwatch-player-aggregated-stats/">
+                <h3 class="media-heading">Overwatch Player Aggregated Stats</h3>
+              </a>
+              <span class="media-meta">
+                <span class="media-date text-small">
+                  Aug 8, 2017
+                </span>
+              </span>
+              <div class="media-content hide-xs font-merryweather">In my free time I spend much of my time playing Overwatch or trying to learn the game. I really enjoy the game and looked into how I could get some stats to find improvements in my game and maybe others as well. There are and were a few problems that I encountered when doing some research on this topic.
+Major IssuesThe APIs that were available were mediocreThe stats available are agregrated vice individual stats for each gameNo easy way that I know of to get lots of player’s statsThe first issue I was able to solve by creating a scraper.</div>
+            </div>
+            <div style="clear:both;"></div>
+            <hr>
+          </div>
+        
+          <div class="media">
+            
+            <div class="media-body">
+              <a class="link-unstyled" href="/2017/08/creating-golf-scores-database/">
+                <h3 class="media-heading">Creating Golf Scores Database</h3>
+              </a>
+              <span class="media-meta">
+                <span class="media-date text-small">
+                  Aug 8, 2017
+                </span>
+              </span>
+              <div class="media-content hide-xs font-merryweather">The goal of this post is to create a database with all the scores recorded on golf tours. ESPN holds all the scorecards of players for each tournament dating back to 2001.
+We are going to start out by exploring around the ESPN website to find out how the data is stored and a way to scrape the data into R and then we are going to export this big data to SQL.</div>
+            </div>
+            <div style="clear:both;"></div>
+            <hr>
+          </div>
+        
+          <div class="media">
+            
+            <div class="media-body">
+              <a class="link-unstyled" href="/2017/07/scraping-pga-site/">
+                <h3 class="media-heading">Scraping PGA Site</h3>
+              </a>
+              <span class="media-meta">
+                <span class="media-date text-small">
+                  Jul 7, 2017
+                </span>
+              </span>
+              <div class="media-content hide-xs font-merryweather">To begin we want to use the json data from the PGA tour website. After doing some investigation into the PGA tour website, there are both pros and cons of using it for scraping.
+From what I have found we will only be able to get shot data from 2014 and beyond. This will contain any data we would want but only goes back to 2014, before 2014 there isn’t even data for simple scorecards for players.</div>
+            </div>
+            <div style="clear:both;"></div>
+            <hr>
+          </div>
+        
+          <div class="media">
+            
+            <div class="media-body">
+              <a class="link-unstyled" href="/2017/07/the-hole-cloud/">
+                <h3 class="media-heading">The Hole Cloud</h3>
+              </a>
+              <span class="media-meta">
+                <span class="media-date text-small">
+                  Jul 7, 2017
+                </span>
+              </span>
+              <div class="media-content hide-xs font-merryweather">In this post I will create word clouds to help determine what may or may not be important in predicting PGA golfers performance. I will start with gathering data from the PGA tour website.
+
+In this example I will be using descriptions from TPC Sawgrass golf course which hosts the Players Championship every year and is one of the most iconic course in the game. The hole descriptions in website format can be found here.</div>
+            </div>
+            <div style="clear:both;"></div>
+            <hr>
+          </div>
+        
+      </div>
+    </div>
+    <div class="modal-footer">
+      <p class="results-count text-medium"
+         data-message-zero="no post found"
+         data-message-one="1 post found"
+         data-message-other="{n} posts found">
+         7 posts found
+      </p>
+    </div>
+  </div>
+</div>
+    
+  
+    
+    <div id="cover" style="background-image:url('http://res.cloudinary.com/gharv/image/upload/v1501069243/cover2_om1zcy.jpg');"></div>
+  
+
+
+    
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.2.4/jquery.min.js" integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44=" crossorigin="anonymous"></script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/2.1.7/js/jquery.fancybox.min.js" integrity="sha256-GEAnjcTqVP+vBp3SSc8bEDQqvWAZMiHyUSIorrWwH50=" crossorigin="anonymous"></script>
+
+
+<script src="/js/script-qi9wbxp2ya2j6p7wx1i6tgavftewndznf4v0hy2gvivk1rxgc3lm7njqb6bz.min.js"></script>
+
+
+
+
+  
+    
+      <script>
+        var disqus_config = function () {
+          this.page.url = '\/2017\/08\/creating-golf-scores-database\/';
+          
+            this.page.identifier = '\/2017\/08\/creating-golf-scores-database\/'
+          
+        };
+        (function() {
+          
+          
+          if (window.location.hostname == "localhost") {
+            return;
+          }
+          var d = document, s = d.createElement('script');
+          var disqus_shortname = 'gharv-github-io';
+          s.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+
+          s.setAttribute('data-timestamp', +new Date());
+          (d.head || d.body).appendChild(s);
+        })();
+      </script>
+    
+  
+
+
+
+    
+  </body>
+</html>
+

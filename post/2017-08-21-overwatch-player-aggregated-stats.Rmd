@@ -1,0 +1,232 @@
+---
+title: Overwatch Player Aggregated Stats
+author: ~
+date: '2017-08-21'
+slug: overwatch-player-aggregated-stats
+categories:
+  - eSports
+tags:
+  - Overwatch
+  - eSports
+  - r
+  - scraping
+  - stats
+thumbnailImagePosition: top
+thumbnailImage: "http://res.cloudinary.com/gharv/image/upload/c_scale,w_600/v1504046617/overwatch_header_kcsuyx.jpg"
+coverImage: "http://res.cloudinary.com/gharv/image/upload/v1504048199/dorado-screenshot-001_rfpku0.jpg"
+---
+
+In my free time I spend much of my time playing Overwatch or trying to learn the game. I really enjoy the game and looked into how I could get some stats to find improvements in my game and maybe others as well. There are and were a few problems that I encountered when doing some research on this topic.
+
+<!--more-->
+
+
+### Major Issues  
+
+
+* The APIs that were available were mediocre
+* The stats available are **agregrated** vice individual stats for each game
+* No easy way that I know of to get lots of player's stats  
+
+***
+
+The first issue I was able to solve by creating a scraper. I created two functions, one is for an individual player's stats and the other is for a list of players. For Overwatch stats we have to have the full battletag, which is what makes it difficult to gather massive amounts of player's stats. For example my name in Overwatch is GHarv but my battletag is GHarv#1283. The battletag number is not easily avialable and the name is case sensitive. All of these things contribute to making gathering player's stats difficult.  
+
+The first thing I needed to do for these scraping functions was to get the names listed in the html code on the [Overwatch website](http://playoverwatch.com/). An example of a profile with the battletag [GHarv#1283](https://playoverwatch.com/en-us/career/pc/us/GHarv-1283) looks like :  
+
+![](http://res.cloudinary.com/gharv/image/upload/v1504044981/overwatch_stats_example_qml4yk.png)  
+
+Now for the list of html code names :  
+
+```{r}
+# Create a list to call back later for referencing the heroes attribute name in the html code
+hero_list <- list()
+hero_list$AllHeroes$Name <- "All Heroes"
+hero_list$AllHeroes$Tag <- "0x02E00000FFFFFFFF"
+hero_list$Reaper$Name <- "Reaper"
+hero_list$Reaper$Tag <- "0x02E0000000000002"
+hero_list$Tracer$Name <- "Tracer"
+hero_list$Tracer$Tag <- "0x02E0000000000003"
+hero_list$Mercy$Name <- "Mercy"
+hero_list$Mercy$Tag <- "0x02E0000000000004"
+hero_list$Hanzo$Name <- "Hanzo"
+hero_list$Hanzo$Tag <- "0x02E0000000000005"
+hero_list$Torb$Name <- "Torb"
+hero_list$Torb$Tag <- "0x02E0000000000006"
+hero_list$Rein$Name <- "Rein"
+hero_list$Rein$Tag <- "0x02E0000000000007"
+hero_list$Pharah$Name <- "Pharah"
+hero_list$Pharah$Tag <- "0x02E0000000000008"
+hero_list$Winston$Name <- "Winston"
+hero_list$Winston$Tag <- "0x02E0000000000009"
+hero_list$Widow$Name <- "Widow"
+hero_list$Widow$Tag <- "0x02E000000000000A"
+hero_list$Bastion$Name <- "Bastion"
+hero_list$Bastion$Tag <- "0x02E0000000000015"
+hero_list$Symmetra$Name <- "Symmetra"
+hero_list$Symmetra$Tag <- "0x02E0000000000016"
+hero_list$Zenyatta$Name <- "Zenyatta"
+hero_list$Zenyatta$Tag <- "0x02E0000000000020"
+hero_list$Genji$Name <- "Genji"
+hero_list$Genji$Tag <- "0x02E0000000000029"
+hero_list$Roadhog$Name <- "Roadhog"
+hero_list$Roadhog$Tag <- "0x02E0000000000040"
+hero_list$McCree$Name <- "McCree"
+hero_list$McCree$Tag <- "0x02E0000000000042"
+hero_list$Junkrat$Name <- "Junkrat"
+hero_list$Junkrat$Tag <- "0x02E0000000000065"
+hero_list$Zarya$Name <- "Zarya"
+hero_list$Zarya$Tag <- "0x02E0000000000068"
+hero_list$Soldier$Name <- "Soldier"
+hero_list$Soldier$Tag <- "0x02E000000000006E"
+hero_list$Lucio$Name <- "Lucio"
+hero_list$Lucio$Tag <- "0x02E0000000000079"
+hero_list$DVa$Name <- "DVa"
+hero_list$DVa$Tag <- "0x02E000000000007A"
+hero_list$Mei$Name <- "Mei"
+hero_list$Mei$Tag <- "0x02E00000000000DD"
+hero_list$Sombra$Name <- "Sombra"
+hero_list$Sombra$Tag <- "0x02E000000000012E"
+hero_list$Doomfist$Name <- "Doomfist"
+hero_list$Doomfist$Tag <- "0x02E000000000012F"
+hero_list$Ana$Name <- "Ana"
+hero_list$Ana$Tag <- "0x02E000000000013B"
+```
+
+
+I will use these in the next lines of code which contain the functions *player_stats* and *players_stats*.  
+*player_stats* is required in order to run *players_stats*.
+
+```{r}
+player_stats <- function (battle_tag) {
+  
+  require(dplyr)
+  require(rvest)
+  
+  # Change battle_tag to player_name (eg : GHarv#1283 to GHarv-1283)
+  player_name <- gsub("(\\w+)#(\\d+)", "\\1-\\2", battle_tag)
+  player_url <-
+    paste0("https://playoverwatch.com/en-us/career/pc/us/",
+           player_name)
+  
+  # Create a list to call back later for referencing the heroes attribute name in the html code
+  source("hero_list_ref.R")
+
+  # Saves the html code for the OW page so we dont ping the OW server for everything afterwards
+  ow_html <- player_url %>%
+    read_html()
+  Sys.sleep(3)
+  
+  # Returns a list of all the heroes reference html attributes to use in the for loop to get all heroes data
+  ref_vector <- ow_html %>%
+    html_nodes("div") %>%
+    html_attr("data-category-id")
+  ref_vector <- ref_vector[!is.na(ref_vector)]
+  ref_vector <- gsub("overwatch.*", "", ref_vector)
+  ref_vector <- ref_vector[ref_vector != ""]
+  
+  # Creates comp_ref_vector that contains only competitive hero tags
+  count = 0
+  comp_ref_vector <- vector()
+  for (i in 1:length(ref_vector)) {
+    if (ref_vector[i] == "0x02E00000FFFFFFFF")
+      count = count + 1
+    if (count == 2)
+      comp_ref_vector <- c(comp_ref_vector, ref_vector[i])
+  }
+  if (count == 1)
+    comp_ref_vector <- ref_vector
+  
+  
+  for (i in 1:length(comp_ref_vector) + 1) {
+    hero_node <- ow_html %>%
+      html_nodes(xpath = paste0('//*[@id="competitive"]/section[3]/div/div[', i, ']'))
+    hero_tag <- hero_node %>%
+      html_attr("data-category-id")
+    for (j in 1:length(hero_list)) {
+      if (hero_tag == hero_list[[j]][[2]]) {
+        hero_list[[j]]$Data <- hero_node %>%
+          html_nodes("td") %>%
+          html_text()
+      }
+    }
+  }
+  
+  for (i in 1:length(hero_list)) {
+    if (length(hero_list[[i]]) == 3) {
+      hero_list[[i]]$Data <-
+        data.frame(matrix(hero_list[[i]]$Data, nrow = 2))
+      names(hero_list[[i]]$Data) <- as.matrix(hero_list[[i]]$Data[1, ])
+      hero_list[[i]]$Data <- hero_list[[i]]$Data[-1, ]
+      rownames(hero_list[[i]]$Data) <- NULL
+      hero_list[[i]]$Data <-
+        cbind(Player = player_name,
+              Hero = hero_list[[i]]$Name,
+              hero_list[[i]]$Data)
+    }
+  }
+  return(hero_list)
+}
+
+
+players_stats <- function(list_of_players) {
+  require(magrittr)
+  require(RCurl)
+  players_stats_df <- data.frame()
+  modified_players_list <- gsub("#", "-", list_of_players)
+  for (i in 1:length(list_of_players)) {
+    if (!RCurl::url.exists(paste0("https://playoverwatch.com/en-us/career/pc/us/", modified_players_list[i]))) next
+    temp_player <- player_stats(list_of_players[i])
+    for (j in 1:25) {
+      players_stats_df <- bind_rows(players_stats_df, temp_player[[j]]$Data)
+    }
+  }
+  players_stats_df %>% mutate_if(is.numeric, funs(ifelse(is.na(.), 0, .)))
+  return(players_stats_df)
+}
+```
+
+
+Well this is great, we now have to ability to get stats data for any player that we have a battletag for. The main issue we were trying to solve from the begining however was a way to improve from looking at our stats. So we need to get stats from some of the top players and compare anything that seems reasonable and try to find how the stats differ and if it can tell us anything about the way we play.  
+
+This now solves our first issue of not having a good api to collect player stats data. We still have two more issues, one being that the stats data is aggregated instead of per game. Unfortunately there is no solution for this problem, we simply have to wait for Blizzard to make this data publicly avialable. The last problem however we can somewhat get around by using leaderboard websites such as [MasterOverwath](https://masteroverwatch.com/leaderboards/pc/us/mode/ranked/category/skillrating). This gives us the battletags of the top 250 players in a region. Now we just have to simply scrape these names and save them to a list then run the list through the players_stats function and we have stats for the top 250 players that will be a good baseline for trying to determine which stats lead to higher rating.  
+
+The MasterOverwatch website has to be scrolled down on the webpage in order to scrape more then 50 players. We will not be able to simply use rvest to scrape the webpage, instead we will need to run a Selenium server in order to access all 250 players. I use docker to run selenium which is a whole different problem that will not be address now (I'm sure you could easily find on google "RSelenium with docker").
+
+```{r eval=FALSE}
+#open docker in cmd and run command : docker run -d -p 4445:4444 selenium/standalone-chrome
+
+library(RSelenium)
+library(rvest)
+masterow_url <- 'https://masteroverwatch.com/leaderboards/pc/us/mode/ranked/category/skillrating'
+remDr <- remoteDriver(remoteServerAddr = "192.168.99.100", port = 4445L, browser = 'chrome')
+remDr$open()
+remDr$navigate(masterow_url)
+
+for (i in 1: 5) {
+  remDr$executeScript(paste("scroll(0,",i*10000,");"))
+  Sys.sleep(3)
+}
+
+page_source <- remDr$getPageSource()
+
+
+players_url <- read_html(page_source[[1]]) %>%  
+  html_nodes(".table-row-link") %>% 
+  html_attr("href")
+
+list_players <- gsub("^.{15}", "", players_url)
+list_players <- gsub("-", "#", list_players)
+list_players <- list_players[-1]
+
+```
+
+Now we have a list of players called *list_players*, this will be used in the *players_stats* function as parameter *list_of_players*.  
+
+```{r eval=FALSE}
+top250_na <- players_stats(list_players)
+```
+
+This will take a while to run but it will return a large data frame that contains stats for each character for each player in the top 250.  
+
+With this data we can later plot some of the stats and determine, through some use of machine learning, if we can find correlations between stats and rating of an indiviual player.

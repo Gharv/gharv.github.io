@@ -1,0 +1,196 @@
+---
+title: "The Hole Cloud"
+author: "Greg Harvey"
+date: 2017-07-24
+categories: ["Golf"]
+tags: ["R", "Golf", "Word cloud", "Visulation", "PGA"]
+thumbnailImagePosition: left
+thumbnailImage: "http://res.cloudinary.com/gharv/image/upload/v1501069269/pga_wordcloud_wyszmj.png"
+coverImage: "http://res.cloudinary.com/gharv/image/upload/v1504197764/pgatour_players_championship_vikfjw.jpg"
+---
+
+In this post I will create **word clouds** to help determine what may or may not be important in predicting PGA golfers performance. I will start with gathering data from the PGA tour website.  
+<!--more-->
+
+In this example I will be using descriptions from **TPC Sawgrass** golf course which hosts the **Players Championship** every year and is one of the most iconic course in the game. The hole descriptions in website format can be found **[here](http://www.pgatour.com/tournaments/the-players-championship/course.html)**.  
+
+The step I will take to accomplish this task are :  
+
+1. Scrape PGA website for word hole descriptions  
+2. Remove frivolous words (known in text mining as **stop words**) for our analysis (e.g. I, me, my, we, our, you)  
+3. Combine words that are the same but not identical because of spelling (e.g. dog leg, dog-leg, dogleg)  
+4. Create word clouds of different lengths to account not only for words but phrases  
+5. Predict?  
+
+##Scraping
+
+I am going to create a function to return text hole data from a specific tournament and year. The year will not matter for our case of the **Players Championship** but it will matter for other tournaments such as the **Open** or **US Open**.
+
+```{r}
+library(dplyr, warn.conflicts = F)
+library(jsonlite)
+
+get_hole_data <- function(tourn_id, year){
+  
+  course_data <- data.frame()  #data frame to return
+  url_seed <- "http://pgatour.com/data/r" 
+  
+  url_course_info <- paste(url_seed, "/", tourn_id, "/", year, "/", "course.json" , sep="")
+  
+  if(!RCurl::url.exists(url_course_info)) stop ("The url does not exist")
+  
+  dat <- fromJSON(url_course_info) 
+  l_course <- length(dat$courses$name) #multiple courses for some tournaments
+  hole_data <- vector("list", l_course)
+  
+  for(j in 1:l_course) {  
+    df <- dat$courses$holes[[j]]
+    if (length(df) == 0) next
+    
+    df <-df %>% select(number, parValue, yards, body) %>% 
+      rename(hole_number = number, par = parValue) %>%
+      mutate(hole = as.numeric(hole_number), 
+             par = as.numeric(par), yards = as.numeric(yards))
+    
+    df$course_name <-rep(dat$courses$name[j], 18)
+    df$year <- year
+    df$tourn_id <-dat$courses$number[j]
+    hole_data[[j]] <- df
+  }
+  course_data <- do.call(plyr::rbind.fill, hole_data)
+  
+  return(course_data)
+}
+```
+## Getting a feel for the data
+In the future I want to create another function that will take a part of the name of the **tournament** or **golf course** played along with a year to return the *tourn_id* so we will not have to look it up. But for now the *tourn_id* for the Players Championship is "011".  
+
+Now that we have the correct *tourn_id* and we have the year we want to use, we make a new variable *players_hole_data* using the function we just defined above.  
+
+After this we want to just see part (using the head function) of the hole description to make sure everything is on track.  
+
+
+```{r}
+players_hole_data <- get_hole_data("011", 2017)
+
+library(knitr)
+players_hole_data <- players_hole_data %>%  arrange(year, hole) %>% select(hole, par, yards, body, course_name)
+kable(head(players_hole_data, n = 3L))
+```
+
+## Cleaning Up
+Now that we have all the data we want, it is time to clean up. Like stated in the steps from the beginning we want to start by removing **stop words**. We are going to accomplish this by using the [tm package](https://cran.r-project.org/web/packages/tm/vignettes/tm.pdf).
+
+```{r}
+library(NLP)
+library(tm)
+
+#put the descriptions in a corpus (i.e. set of documents)
+hole_corpus <- Corpus(VectorSource(players_hole_data$body))
+
+# a function to clean the corpus (remove numbers, whitespace, etc...)
+clean_corpus <- function(corpus) {
+  corpus <- tm_map(corpus, content_transformer(tolower))
+  corpus <- tm_map(corpus, removePunctuation)
+  corpus <- tm_map(corpus, stripWhitespace)
+  corpus <- tm_map(corpus, removeNumbers)
+  corpus <- tm_map(corpus, removeWords, stopwords("english"))
+  return(corpus)
+}
+
+hole_corpus <- clean_corpus(hole_corpus)
+
+#make a document term matrix
+dtm <- DocumentTermMatrix(hole_corpus)
+
+dtm_mat <- as.matrix(dtm)
+
+#word frequencies
+word_freqs <- colSums(dtm_mat)
+word_freqs <- sort(word_freqs, decreasing = T)
+word_names <- names(word_freqs)
+```
+
+## Finally a Wordcloud
+Now we can actually create our word cloud to have a visual of word frequencies for the entire course.
+
+```{r}
+library(RColorBrewer)
+library(wordcloud)
+
+my_palette <- brewer.pal(n = 4,name = "Spectral")
+n <- 40
+set.seed(112)
+layout(matrix(c(1, 2), nrow = 2), heights = c(1, 15))
+par(mar=rep(0, 4))
+plot.new()
+text(x = .5, y = .5, "Hole description word cloud")
+wordcloud(word_names[1:n], word_freqs[1:n], colors = my_palette)
+```
+
+So from this we can see the word that appears the most throughout the 18 holes at TPC sawgrass is the word "**green**". Well that doesn't tell us much but we can see why it appears the most, every hole will have a green.  
+
+The more interesting words we can find in this word cloud would be words like "**water**", "**hazard**", "**trees**", "**bunkers**", and "**narrow**". These words do not always occur on all golf courses. This is where we can establish a difference for this course. From this word list we can deduce that precision will be a key when playing here.  
+
+While these words give us some insight into the course we may want to look into phrases of words to come up with different information, so lets take a look at n-grams.  
+
+## N-Grams
+**N-Grams** are a contiguous sequence of **n** items of a given text. For example, instead of just the words "**dogleg**" and "**left**" a 2-gram or bi gram would be "**dogleg left**". A trig ram would be something like "**left fairway bunker**".  
+
+We now need to create another list but instead of singular words it will now be of two words.  
+
+```{r}
+
+hole_text_clean <- unlist(hole_corpus)
+
+# split into words
+hole_words <- strsplit(hole_text_clean, " ", fixed = T)
+hole_words <- unlist(hole_words)
+hole_words <- hole_words[hole_words != ""]
+names(hole_words) <- NULL #remove the attributes
+
+# get the bigrams
+hole_bigrams = vapply(ngrams(hole_words, 2), paste, "", collapse = " ")
+
+# count using xtabs
+hole_bigrams_count <- as.data.frame(xtabs(~hole_bigrams)) %>% tbl_df() %>% arrange(desc(Freq))
+
+my_palette2 <- brewer.pal(n = 4,name = "BrBG")
+
+layout(matrix(c(1, 2), nrow = 2), heights = c(1, 15))
+par(mar=rep(0, 4))
+plot.new()
+text(x = .5, y = .5, "Bigram hole description word cloud")
+
+set.seed(10)
+wordcloud(hole_bigrams_count$hole_bigrams, hole_bigrams_count$Freq, min.freq = 6, scale = c(2.5, .5), 
+          random.order = T, colors = my_palette2)
+```
+
+We already knew about the "**water**" and this is backed up further by the following "**water hazard**" and "**lateral water**" so golfers that are not accurate will have to deal with water hazards often.  
+
+However, from looking at the above bi gram we can make further conclusions about the course. For example, we find new phrases such as "**short iron**" and "**fairway wood**". These can give indications that on many holes these clubs will be used so looking at approaches from distances of 100 - 150 for **short irons** and approaches from distances of 250 -275 for **fairway wood** will help find players that fit this course.  
+
+Now lets see if trig rams will be able to provide any more insight.  
+```{r}
+hole_trigrams <-  vapply(ngrams(hole_words, 3), paste, "", collapse = " ")
+
+# count using xtabs
+hole_trigrams_count <- as.data.frame(xtabs(~hole_trigrams)) %>% tbl_df() %>% arrange(desc(Freq))
+
+my_palette3 <- brewer.pal(n = 3,name = "Dark2")
+
+set.seed(15)
+
+wordcloud(hole_trigrams_count$hole_trigrams, hole_trigrams_count$Freq, min.freq = 4, scale = c(2.5, .5),
+          random.order = T, colors = my_palette3)
+```
+
+Unfortunately, from this trig ram not much can be drawn other than maybe we have some par 5s that can be reached in two.  
+
+##Takeaway
+Going through these word clouds we can make a few assessments. We have learned that this course has **water** as **hazards** and that the **fairway wood** and **short irons** will be important. We also can assume that distance will be important since the golfers can get on the par 5s **green in two shots**.  
+
+While it is typical to go through hole by hole and figure out which shots will be more important and how many par 5s are reachable in two for which golfers, this give a good visual overview of the course. This would be a great place to start analysis of a course and a good simple way to compare courses against each other by looking at the frequencies of words used.  
+
+In the future I will expand more on this topic and see if and how predictive this can be for specific players.

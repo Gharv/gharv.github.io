@@ -1,0 +1,143 @@
+---
+title: "PGA Analysis"
+author: "Greg Harvey"
+date: '2018-04-21'
+output:
+  html_document:
+    df_print: paged
+coverImage: "http://res.cloudinary.com/gharv/image/upload/v1504197764/Nicklaus_13th-2_psqkvu.jpg"
+slug: pga-analysis
+tags: ["R", "golf", "scraping", "shot data", "PGA"]
+thumbnailImage: "http://res.cloudinary.com/gharv/image/upload/v1524415034/phil_start_j9uyo4.jpg"
+thumbnailImagePosition: right
+categories: ["Golf"]
+---
+
+# Do PGA Golfers Preform Better in Different Regions or Rounds?  
+
+Many times I hear either on TV or through friends that X golfer preforms better in round 4 or that X golfer seems to play better in the south. Intuitively I can see the case for both, some golfers may preform better on a given round due to their mindset. It is even easier to understand that players may play better in a given region, due to being in an area they are comfortable with or grew up and where they are more familiar with the typical layouts of courses or the grass of the course so lets look into it.
+
+In order to preform this analysis we are going to split regions of the USA into:  
+
+* Northeast
+* Midwest
+* South
+* West
+
+These regions we chosen based off how the US Census Bureau splits regions. Below we will import our data from the previous post and a few libraries we will use throughout.
+
+```{r message=FALSE}
+library(ggplot2)
+library(dplyr)
+library(knitr)
+df <- read.csv("https://github.com/Gharv/PGA/blob/master/sample_pga_hole_scores07-17.csv?raw=true")
+```
+
+This contains a sample of the PGA hole scores data from 2007 to 2017. Specifically it contains only the players: 
+
+* Tiger Woods
+* Jordan Spieth
+* Dustin Johnson
+* Rory McIlroy
+* Phil Mickelson
+* and a few others.
+
+## Balanced Factorial Design with Two Treatment Factors
+
+![](http://res.cloudinary.com/gharv/image/upload/v1524414853/design_ex_rd8pef.png)
+
+For this example I will just look into one single player for brevity, which I will choose Phil Mickelson and determine if the region he plays or the round he plays or their interaction has an effect on his score of a hole.
+
+<div style="width:1024px; height:576px">
+![](http://res.cloudinary.com/gharv/image/upload/v1524415034/phil_start_j9uyo4.jpg)
+</div>
+
+```{r}
+pm <- filter(df, PlayerName == "Phil Mickelson" & Region != "hawaii" & Round != 5)
+pm[,c("Region", "Round")] <- lapply(pm[,c("Region", "Round")], factor)
+pm <- mutate(pm, ScoreAdj = Strokes - Par.x)
+
+kable(table(pm$Region, pm$Round))
+min_sample <- min(table(pm$Region, pm$Round))
+print(min_sample)
+pm <- pm %>% group_by(Region, Round) %>% sample_n(min_sample)
+kable(table(pm$Region, pm$Round))
+
+fit1 <- lm(ScoreAdj ~ Region * Round, data = pm)
+fit2 <- lm(ScoreAdj ~ Region, data = pm)
+aov2 <- aov(ScoreAdj ~ Region, data = pm)
+```
+
+
+Next thing we need to do is check our assumptions before preceding with our analysis.  
+
+## Check Assumptions  
+
+There are 3 assumptions we need to check:  
+
+1. Independence of Errors
+2. Normality of Errors
+3. Equal Error Variance Across Treatments
+
+The first assumption we assume that players are trying equally on all holes which gives us independence among each hole. In reality there are many things that can effect a player, golf is one of those sports that can be very mental which can effect this assumption but here we are going to assume each player gives equal effort for each hole.  
+
+The second assumption doesn't have to feel so hand wavy, we can actually plot the data to check our assumption of normality. A common approach to achieve this is to look that a Normal Q-Q Plot given below:  
+
+```{r eval=FALSE}
+hist(pm$ScoreAdj)
+```
+![](http://res.cloudinary.com/gharv/image/upload/v1524416725/hist_kvo9yp.jpg)
+For the above histogram the data looks fairly normal.
+
+
+The third assumption of equal variance can be checked with the levene's test which we run below:   
+
+```{r message=FALSE}
+library(car)
+leveneTest(fit2)
+```
+
+From the output above we can see that the p-value is not less than the significance level of 0.05. This means that there is no evidence to suggest that the variance across groups is statistically significantly different. Therefore, we can assume the homogeneity of variances in the different treatment groups.  
+
+
+## Continue with Our Model  
+
+We can run an ANOVA to get our covariates:  
+
+```{r}
+options(knitr.kable.NA = "")
+kable(anova(fit1), digits = 4)
+```
+
+From the above output we can we that the interaction effect is not significant, it also looks like the Round effect is also not very significant. So lets continue on with a one way ANOVA looking at just the Region.  
+
+```{r}
+kable(anova(fit2), digits = 4)
+```
+
+We can see that it looks like Region has an effect, so lets look at the estimates to maybe determine if specific regions differ from each other.  
+
+```{r}
+print(summary(fit2))
+```
+
+```{r}
+kable(TukeyHSD(aov2, which = "Region")$Region)
+kable(pairwise.t.test(pm$ScoreAdj, pm$Region, p.adjust.method = "BH")$p.value)
+```
+
+# Conclusions
+
+We can see through the comparisons test that Phil Mickelson is better in the west region. This makes intuitive sense because he grew up and lives in San Diego, CA and played collegiate golf at Arizona State.  
+
+![](http://res.cloudinary.com/gharv/image/upload/v1524381025/phil_mountain_l6awej.jpg)
+
+
+## Future
+
+There are a few issues we have not addressed that we can run more tests and arrange our data better. One issue that is possible yet unlikely and is probably washed out over big samples is the fact that there could simply be just easier courses on the west coast causing lower scores. A good way to fix this is to take the golfers score for a given hole and instead of subtracting it from the par value we subtract it from the mean of all scores recorded on that hole for that day. That also has its issues however, because now we are assuming that each day has equal talent played on each hole. Adjusting for the strength of the field would be a good way to account for this and would take considerable work.
+
+
+
+
+

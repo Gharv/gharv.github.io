@@ -1,0 +1,857 @@
+
+
+  
+    
+  
+
+
+  
+
+
+
+
+  
+
+
+  
+
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="generator" content="Hugo 0.42.1 with theme Tranquilpeak 0.4.3-BETA">
+    <title>The Hole Cloud</title>
+    <meta name="author" content="Greg Harvey">
+    <meta name="keywords" content=", r, data, analytics, sports, economics, golf, football">
+
+    <link rel="icon" href="http://res.cloudinary.com/gharv/image/upload/v1501075122/money_golf_ball_m6oucp.png">
+    
+
+    
+    <meta name="description" content="In this post I will create word clouds to help determine what may or may not be important in predicting PGA golfers performance. I will start with gathering data from the PGA tour website.
+
+In this example I will be using descriptions from TPC Sawgrass golf course which hosts the Players Championship every year and is one of the most iconic course in the game. The hole descriptions in website format can be found here.">
+    <meta property="og:description" content="In this post I will create word clouds to help determine what may or may not be important in predicting PGA golfers performance. I will start with gathering data from the PGA tour website.
+
+In this example I will be using descriptions from TPC Sawgrass golf course which hosts the Players Championship every year and is one of the most iconic course in the game. The hole descriptions in website format can be found here.">
+    <meta property="og:type" content="blog">
+    <meta property="og:title" content="The Hole Cloud">
+    <meta property="og:url" content="/2017/07/the-hole-cloud/">
+    <meta property="og:site_name" content="Sportnomics">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="Sportnomics">
+    <meta name="twitter:description" content="In this post I will create word clouds to help determine what may or may not be important in predicting PGA golfers performance. I will start with gathering data from the PGA tour website.
+
+In this example I will be using descriptions from TPC Sawgrass golf course which hosts the Players Championship every year and is one of the most iconic course in the game. The hole descriptions in website format can be found here.">
+    
+    
+
+    
+    
+
+    
+      <meta property="og:image" content="//www.gravatar.com/avatar/d03bc8e23b9b38d63432dc7973514ec4?s=640">
+    
+
+    
+      <meta property="og:image" content="http://res.cloudinary.com/gharv/image/upload/v1501069269/pga_wordcloud_wyszmj.png">
+    
+    
+      <meta property="og:image" content="http://res.cloudinary.com/gharv/image/upload/v1504197764/pgatour_players_championship_vikfjw.jpg">
+    
+    
+
+    
+
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" integrity="sha256-eZrrJcwDc/3uDhsdt61sL2oOBY362qM3lon1gyExkL0=" crossorigin="anonymous" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/2.1.4/jquery.fancybox.min.css" integrity="sha256-vuXZ9LGmmwtjqFX1F+EKin1ThZMub58gKULUyf0qECk=" crossorigin="anonymous" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/2.1.4/helpers/jquery.fancybox-thumbs.min.css" integrity="sha256-SEa4XYAHihTcEP1f5gARTB2K26Uk8PsndQYHQC1f4jU=" crossorigin="anonymous" />
+    
+    
+    <link rel="stylesheet" href="/css/style-jsjn0006wyhpyzivf6yceb31gvpjatbcs3qzjvlumobfnugccvobqwxnnaj8.min.css" />
+    
+    
+
+    
+      
+    
+    
+  </head>
+
+  <body>
+    <div id="blog">
+      <header id="header" data-behavior="5">
+  <i id="btn-open-sidebar" class="fa fa-lg fa-bars"></i>
+  <div class="header-title">
+    <a class="header-title-link" href="/">Sportnomics</a>
+  </div>
+  
+    
+      <a class="header-right-picture "
+         href="/#about">
+    
+    
+    
+      
+        <img class="header-picture" src="//www.gravatar.com/avatar/d03bc8e23b9b38d63432dc7973514ec4?s=90" alt="Author&#39;s picture" />
+      
+    
+    </a>
+  
+</header>
+
+      <nav id="sidebar" data-behavior="5">
+  <div class="sidebar-container">
+    
+      <div class="sidebar-profile">
+        <a href="/#about">
+          <img class="sidebar-profile-picture" src="//www.gravatar.com/avatar/d03bc8e23b9b38d63432dc7973514ec4?s=110" alt="Author&#39;s picture" />
+        </a>
+        <h4 class="sidebar-profile-name">Greg Harvey</h4>
+        
+          <h5 class="sidebar-profile-bio">Statistics student interested in analytics for sports and economics</h5>
+        
+      </div>
+    
+    <ul class="sidebar-buttons">
+      
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-home"></i>
+      
+      <span class="sidebar-button-desc">Home</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="/categories">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-list-ul"></i>
+      
+      <span class="sidebar-button-desc">Categories</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="/tags">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-tags"></i>
+      
+      <span class="sidebar-button-desc">Tags</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="/archives">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-archive"></i>
+      
+      <span class="sidebar-button-desc">Archives</span>
+    </a>
+  </li>
+
+
+    </ul>
+    <ul class="sidebar-buttons">
+      
+
+    </ul>
+    <ul class="sidebar-buttons">
+      
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="/categories/football">
+    
+      <i class="sidebar-button-icon fa fa-facebook "></i>
+      
+      <span class="sidebar-button-desc">Football</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="/categories/golf">
+    
+      <i class="sidebar-button-icon fa fa-ravelry "></i>
+      
+      <span class="sidebar-button-desc">Golf</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="/categories/economics">
+    
+      <i class="sidebar-button-icon fa fa-money "></i>
+      
+      <span class="sidebar-button-desc">Economics</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="/categories/esports">
+    
+      <i class="sidebar-button-icon fa fa-twitch "></i>
+      
+      <span class="sidebar-button-desc">eSports</span>
+    </a>
+  </li>
+
+
+    </ul>
+  </div>
+</nav>
+
+      
+  <div class="post-header-cover
+              text-left
+              "
+       style="background-image:url('http://res.cloudinary.com/gharv/image/upload/v1504197764/pgatour_players_championship_vikfjw.jpg')"
+       data-behavior="5">
+    
+      <div class="post-header main-content-wrap text-left">
+  
+    <h1 class="post-title" itemprop="headline">
+      The Hole Cloud
+    </h1>
+  
+  
+  <div class="postShorten-meta post-meta">
+    
+      <time itemprop="datePublished" datetime="2017-07-24T00:00:00Z">
+        
+  July 24, 2017
+
+      </time>
+    
+    
+  
+  
+    <span>in</span>
+    
+      <a class="category-link" href="/categories/golf">Golf</a>
+    
+  
+
+  </div>
+
+</div>
+    
+  </div>
+
+
+      <div id="main" data-behavior="5"
+        class="hasCover
+               hasCoverMetaIn
+               ">
+        <article class="post" itemscope itemType="http://schema.org/BlogPosting">
+          
+          
+          <div class="post-content markdown" itemprop="articleBody">
+            <div class="main-content-wrap">
+              <p>In this post I will create <strong>word clouds</strong> to help determine what may or may not be important in predicting PGA golfers performance. I will start with gathering data from the PGA tour website.<br />
+<!--more--></p>
+<p>In this example I will be using descriptions from <strong>TPC Sawgrass</strong> golf course which hosts the <strong>Players Championship</strong> every year and is one of the most iconic course in the game. The hole descriptions in website format can be found <strong><a href="http://www.pgatour.com/tournaments/the-players-championship/course.html">here</a></strong>.</p>
+<p>The step I will take to accomplish this task are :</p>
+<ol style="list-style-type: decimal">
+<li>Scrape PGA website for word hole descriptions<br />
+</li>
+<li>Remove frivolous words (known in text mining as <strong>stop words</strong>) for our analysis (e.g. I, me, my, we, our, you)<br />
+</li>
+<li>Combine words that are the same but not identical because of spelling (e.g. dog leg, dog-leg, dogleg)<br />
+</li>
+<li>Create word clouds of different lengths to account not only for words but phrases<br />
+</li>
+<li>Predict?</li>
+</ol>
+<p>##Scraping</p>
+<p>I am going to create a function to return text hole data from a specific tournament and year. The year will not matter for our case of the <strong>Players Championship</strong> but it will matter for other tournaments such as the <strong>Open</strong> or <strong>US Open</strong>.</p>
+<pre class="r"><code>library(dplyr, warn.conflicts = F)
+library(jsonlite)
+
+get_hole_data &lt;- function(tourn_id, year){
+  
+  course_data &lt;- data.frame()  #data frame to return
+  url_seed &lt;- &quot;http://pgatour.com/data/r&quot; 
+  
+  url_course_info &lt;- paste(url_seed, &quot;/&quot;, tourn_id, &quot;/&quot;, year, &quot;/&quot;, &quot;course.json&quot; , sep=&quot;&quot;)
+  
+  if(!RCurl::url.exists(url_course_info)) stop (&quot;The url does not exist&quot;)
+  
+  dat &lt;- fromJSON(url_course_info) 
+  l_course &lt;- length(dat$courses$name) #multiple courses for some tournaments
+  hole_data &lt;- vector(&quot;list&quot;, l_course)
+  
+  for(j in 1:l_course) {  
+    df &lt;- dat$courses$holes[[j]]
+    if (length(df) == 0) next
+    
+    df &lt;-df %&gt;% select(number, parValue, yards, body) %&gt;% 
+      rename(hole_number = number, par = parValue) %&gt;%
+      mutate(hole = as.numeric(hole_number), 
+             par = as.numeric(par), yards = as.numeric(yards))
+    
+    df$course_name &lt;-rep(dat$courses$name[j], 18)
+    df$year &lt;- year
+    df$tourn_id &lt;-dat$courses$number[j]
+    hole_data[[j]] &lt;- df
+  }
+  course_data &lt;- do.call(plyr::rbind.fill, hole_data)
+  
+  return(course_data)
+}</code></pre>
+<div id="getting-a-feel-for-the-data" class="section level2">
+<h2>Getting a feel for the data</h2>
+<p>In the future I want to create another function that will take a part of the name of the <strong>tournament</strong> or <strong>golf course</strong> played along with a year to return the <em>tourn_id</em> so we will not have to look it up. But for now the <em>tourn_id</em> for the Players Championship is “011”.</p>
+<p>Now that we have the correct <em>tourn_id</em> and we have the year we want to use, we make a new variable <em>players_hole_data</em> using the function we just defined above.</p>
+<p>After this we want to just see part (using the head function) of the hole description to make sure everything is on track.</p>
+<pre class="r"><code>players_hole_data &lt;- get_hole_data(&quot;011&quot;, 2017)
+
+library(knitr)
+players_hole_data &lt;- players_hole_data %&gt;%  arrange(year, hole) %&gt;% select(hole, par, yards, body, course_name)
+kable(head(players_hole_data, n = 3L))</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="right">hole</th>
+<th align="right">par</th>
+<th align="right">yards</th>
+<th align="left">body</th>
+<th align="left">course_name</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="right">1</td>
+<td align="right">4</td>
+<td align="right">423</td>
+<td align="left">From the start, the golf course demands accuracy from the tee. On this slight dogleg to the right, a drive to the right side of the narrow landing area will give the player a good angle to approach the long and narrow green. A long fairway bunker, a lateral water hazard and grass bunkers await errant drives to the right, and dense trees guard the fairway to the left. As this is a medium-length par 4, the emphasis is again on accuracy for the second shot. Large maintained bunkers protect the front and left portions of the green. Grass bunkers in the front right, right and rear areas of the green protect the remainder of it. The drive will be with a driver or fairway wood, the second shot with a middle to short iron.</td>
+<td align="left">TPC Sawgrass</td>
+</tr>
+<tr class="even">
+<td align="right">2</td>
+<td align="right">5</td>
+<td align="right">532</td>
+<td align="left">On this relatively short par 5, the player’s success once again begins on the tee. A long and accurate drive will enable the majority of players to attempt to reach the green in two shots. Dense trees on both sides, with a lateral water hazard to the right, protect the sloped landing area of the drive. A small pond and a large fairway bunker on the right guard the fairway and green from 175 yards out. Deep maintained bunkers are on both sides of the green, along with numerous grass bunkers. The mounds located around this green give spectators a good view of players attempting to reach the green in two shots and players attempting to save par.</td>
+<td align="left">TPC Sawgrass</td>
+</tr>
+<tr class="odd">
+<td align="right">3</td>
+<td align="right">3</td>
+<td align="right">177</td>
+<td align="left">A maintained spectator mound to the left of this medium-length par 3 offers a view of the entire hole. A shot requiring a middle to short iron is needed to reach the two-tiered green which slopes from back to front. A bunker in the front of the green and grass bunkers to the right protect what is left unguarded by a large maintained bunker to the left and rear left portion of the green. There probably will be more birdies scored here than on the other par-3 holes.</td>
+<td align="left">TPC Sawgrass</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="cleaning-up" class="section level2">
+<h2>Cleaning Up</h2>
+<p>Now that we have all the data we want, it is time to clean up. Like stated in the steps from the beginning we want to start by removing <strong>stop words</strong>. We are going to accomplish this by using the <a href="https://cran.r-project.org/web/packages/tm/vignettes/tm.pdf">tm package</a>.</p>
+<pre class="r"><code>library(NLP)
+library(tm)
+
+#put the descriptions in a corpus (i.e. set of documents)
+hole_corpus &lt;- Corpus(VectorSource(players_hole_data$body))
+
+# a function to clean the corpus (remove numbers, whitespace, etc...)
+clean_corpus &lt;- function(corpus) {
+  corpus &lt;- tm_map(corpus, content_transformer(tolower))
+  corpus &lt;- tm_map(corpus, removePunctuation)
+  corpus &lt;- tm_map(corpus, stripWhitespace)
+  corpus &lt;- tm_map(corpus, removeNumbers)
+  corpus &lt;- tm_map(corpus, removeWords, stopwords(&quot;english&quot;))
+  return(corpus)
+}
+
+hole_corpus &lt;- clean_corpus(hole_corpus)</code></pre>
+<pre><code>## Warning in tm_map.SimpleCorpus(corpus, content_transformer(tolower)):
+## transformation drops documents</code></pre>
+<pre><code>## Warning in tm_map.SimpleCorpus(corpus, removePunctuation): transformation
+## drops documents</code></pre>
+<pre><code>## Warning in tm_map.SimpleCorpus(corpus, stripWhitespace): transformation
+## drops documents</code></pre>
+<pre><code>## Warning in tm_map.SimpleCorpus(corpus, removeNumbers): transformation drops
+## documents</code></pre>
+<pre><code>## Warning in tm_map.SimpleCorpus(corpus, removeWords, stopwords(&quot;english&quot;)):
+## transformation drops documents</code></pre>
+<pre class="r"><code>#make a document term matrix
+dtm &lt;- DocumentTermMatrix(hole_corpus)
+
+dtm_mat &lt;- as.matrix(dtm)
+
+#word frequencies
+word_freqs &lt;- colSums(dtm_mat)
+word_freqs &lt;- sort(word_freqs, decreasing = T)
+word_names &lt;- names(word_freqs)</code></pre>
+</div>
+<div id="finally-a-wordcloud" class="section level2">
+<h2>Finally a Wordcloud</h2>
+<p>Now we can actually create our word cloud to have a visual of word frequencies for the entire course.</p>
+<pre class="r"><code>library(RColorBrewer)
+library(wordcloud)
+
+my_palette &lt;- brewer.pal(n = 4,name = &quot;Spectral&quot;)
+n &lt;- 40
+set.seed(112)
+layout(matrix(c(1, 2), nrow = 2), heights = c(1, 15))
+par(mar=rep(0, 4))
+plot.new()
+text(x = .5, y = .5, &quot;Hole description word cloud&quot;)
+wordcloud(word_names[1:n], word_freqs[1:n], colors = my_palette)</code></pre>
+<p><img src="/post/2017-07-24-hole-description-analysis_files/figure-html/unnamed-chunk-4-1.png" width="672" /></p>
+<p>So from this we can see the word that appears the most throughout the 18 holes at TPC sawgrass is the word “<strong>green</strong>”. Well that doesn’t tell us much but we can see why it appears the most, every hole will have a green.</p>
+<p>The more interesting words we can find in this word cloud would be words like “<strong>water</strong>”, “<strong>hazard</strong>”, “<strong>trees</strong>”, “<strong>bunkers</strong>”, and “<strong>narrow</strong>”. These words do not always occur on all golf courses. This is where we can establish a difference for this course. From this word list we can deduce that precision will be a key when playing here.</p>
+<p>While these words give us some insight into the course we may want to look into phrases of words to come up with different information, so lets take a look at n-grams.</p>
+</div>
+<div id="n-grams" class="section level2">
+<h2>N-Grams</h2>
+<p><strong>N-Grams</strong> are a contiguous sequence of <strong>n</strong> items of a given text. For example, instead of just the words “<strong>dogleg</strong>” and “<strong>left</strong>” a 2-gram or bi gram would be “<strong>dogleg left</strong>”. A trig ram would be something like “<strong>left fairway bunker</strong>”.</p>
+<p>We now need to create another list but instead of singular words it will now be of two words.</p>
+<pre class="r"><code>hole_text_clean &lt;- unlist(hole_corpus)
+
+# split into words
+hole_words &lt;- strsplit(hole_text_clean, &quot; &quot;, fixed = T)
+hole_words &lt;- unlist(hole_words)
+hole_words &lt;- hole_words[hole_words != &quot;&quot;]
+names(hole_words) &lt;- NULL #remove the attributes
+
+# get the bigrams
+hole_bigrams = vapply(ngrams(hole_words, 2), paste, &quot;&quot;, collapse = &quot; &quot;)
+
+# count using xtabs
+hole_bigrams_count &lt;- as.data.frame(xtabs(~hole_bigrams)) %&gt;% tbl_df() %&gt;% arrange(desc(Freq))
+
+my_palette2 &lt;- brewer.pal(n = 4,name = &quot;BrBG&quot;)
+
+layout(matrix(c(1, 2), nrow = 2), heights = c(1, 15))
+par(mar=rep(0, 4))
+plot.new()
+text(x = .5, y = .5, &quot;Bigram hole description word cloud&quot;)
+
+set.seed(10)
+wordcloud(hole_bigrams_count$hole_bigrams, hole_bigrams_count$Freq, min.freq = 6, scale = c(2.5, .5), 
+          random.order = T, colors = my_palette2)</code></pre>
+<p><img src="/post/2017-07-24-hole-description-analysis_files/figure-html/unnamed-chunk-5-1.png" width="672" /></p>
+<p>We already knew about the “<strong>water</strong>” and this is backed up further by the following “<strong>water hazard</strong>” and “<strong>lateral water</strong>” so golfers that are not accurate will have to deal with water hazards often.</p>
+<p>However, from looking at the above bi gram we can make further conclusions about the course. For example, we find new phrases such as “<strong>short iron</strong>” and “<strong>fairway wood</strong>”. These can give indications that on many holes these clubs will be used so looking at approaches from distances of 100 - 150 for <strong>short irons</strong> and approaches from distances of 250 -275 for <strong>fairway wood</strong> will help find players that fit this course.</p>
+<p>Now lets see if trig rams will be able to provide any more insight.</p>
+<pre class="r"><code>hole_trigrams &lt;-  vapply(ngrams(hole_words, 3), paste, &quot;&quot;, collapse = &quot; &quot;)
+
+# count using xtabs
+hole_trigrams_count &lt;- as.data.frame(xtabs(~hole_trigrams)) %&gt;% tbl_df() %&gt;% arrange(desc(Freq))
+
+my_palette3 &lt;- brewer.pal(n = 3,name = &quot;Dark2&quot;)
+
+set.seed(15)
+
+wordcloud(hole_trigrams_count$hole_trigrams, hole_trigrams_count$Freq, min.freq = 4, scale = c(2.5, .5),
+          random.order = T, colors = my_palette3)</code></pre>
+<p><img src="/post/2017-07-24-hole-description-analysis_files/figure-html/unnamed-chunk-6-1.png" width="672" /></p>
+<p>Unfortunately, from this trig ram not much can be drawn other than maybe we have some par 5s that can be reached in two.</p>
+<p>##Takeaway
+Going through these word clouds we can make a few assessments. We have learned that this course has <strong>water</strong> as <strong>hazards</strong> and that the <strong>fairway wood</strong> and <strong>short irons</strong> will be important. We also can assume that distance will be important since the golfers can get on the par 5s <strong>green in two shots</strong>.</p>
+<p>While it is typical to go through hole by hole and figure out which shots will be more important and how many par 5s are reachable in two for which golfers, this give a good visual overview of the course. This would be a great place to start analysis of a course and a good simple way to compare courses against each other by looking at the frequencies of words used.</p>
+<p>In the future I will expand more on this topic and see if and how predictive this can be for specific players.</p>
+</div>
+
+              
+            </div>
+          </div>
+          <div id="post-footer" class="post-footer main-content-wrap">
+            
+              
+                
+                
+                  <div class="post-footer-tags">
+                    <span class="text-color-light text-small">TAGGED IN</span><br/>
+                    
+  <a class="tag tag--primary tag--small" href="/tags/r/">R</a>
+
+  <a class="tag tag--primary tag--small" href="/tags/golf/">Golf</a>
+
+  <a class="tag tag--primary tag--small" href="/tags/word-cloud/">Word cloud</a>
+
+  <a class="tag tag--primary tag--small" href="/tags/visulation/">Visulation</a>
+
+  <a class="tag tag--primary tag--small" href="/tags/pga/">PGA</a>
+
+                  </div>
+                
+              
+            
+            
+  <div class="post-actions-wrap">
+      <nav >
+        <ul class="post-actions post-action-nav">
+          
+            <li class="post-action">
+              
+                <a class="post-action-btn btn btn--default tooltip--top" href="/2017/07/scraping-pga-site/" data-tooltip="Scraping PGA Site">
+              
+                  <i class="fa fa-angle-left"></i>
+                  <span class="hide-xs hide-sm text-small icon-ml">NEXT</span>
+                </a>
+            </li>
+            <li class="post-action">
+              
+                <a class="post-action-btn btn btn--disabled">
+              
+                  <span class="hide-xs hide-sm text-small icon-mr">PREVIOUS</span>
+                  <i class="fa fa-angle-right"></i>
+                </a>
+            </li>
+          
+        </ul>
+      </nav>
+    <ul class="post-actions post-action-share" >
+      
+        <li class="post-action hide-lg hide-md hide-sm">
+          <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions">
+            <i class="fa fa-share-alt"></i>
+          </a>
+        </li>
+        
+      
+      
+        <li class="post-action">
+          <a class="post-action-btn btn btn--default" href="#disqus_thread">
+            <i class="fa fa-comment-o"></i>
+          </a>
+        </li>
+      
+      <li class="post-action">
+        
+          <a class="post-action-btn btn btn--default" href="#">
+        
+          <i class="fa fa-list"></i>
+        </a>
+      </li>
+    </ul>
+  </div>
+
+
+            
+              
+                <div id="disqus_thread">
+  <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+              
+            
+          </div>
+        </article>
+        <footer id="footer" class="main-content-wrap">
+  <span class="copyrights">
+    &copy; 2018 Greg Harvey. All Rights Reserved
+  </span>
+</footer>
+
+      </div>
+      <div id="bottom-bar" class="post-bottom-bar" data-behavior="5">
+        
+  <div class="post-actions-wrap">
+      <nav >
+        <ul class="post-actions post-action-nav">
+          
+            <li class="post-action">
+              
+                <a class="post-action-btn btn btn--default tooltip--top" href="/2017/07/scraping-pga-site/" data-tooltip="Scraping PGA Site">
+              
+                  <i class="fa fa-angle-left"></i>
+                  <span class="hide-xs hide-sm text-small icon-ml">NEXT</span>
+                </a>
+            </li>
+            <li class="post-action">
+              
+                <a class="post-action-btn btn btn--disabled">
+              
+                  <span class="hide-xs hide-sm text-small icon-mr">PREVIOUS</span>
+                  <i class="fa fa-angle-right"></i>
+                </a>
+            </li>
+          
+        </ul>
+      </nav>
+    <ul class="post-actions post-action-share" >
+      
+        <li class="post-action hide-lg hide-md hide-sm">
+          <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions">
+            <i class="fa fa-share-alt"></i>
+          </a>
+        </li>
+        
+      
+      
+        <li class="post-action">
+          <a class="post-action-btn btn btn--default" href="#disqus_thread">
+            <i class="fa fa-comment-o"></i>
+          </a>
+        </li>
+      
+      <li class="post-action">
+        
+          <a class="post-action-btn btn btn--default" href="#">
+        
+          <i class="fa fa-list"></i>
+        </a>
+      </li>
+    </ul>
+  </div>
+
+
+      </div>
+      <div id="share-options-bar" class="share-options-bar" data-behavior="5">
+  <i id="btn-close-shareoptions" class="fa fa-close"></i>
+  <ul class="share-options">
+    
+  </ul>
+</div>
+<div id="share-options-mask" class="share-options-mask"></div>
+    </div>
+    
+    <div id="about">
+  <div id="about-card">
+    <div id="about-btn-close">
+      <i class="fa fa-remove"></i>
+    </div>
+    
+      <img id="about-card-picture" src="//www.gravatar.com/avatar/d03bc8e23b9b38d63432dc7973514ec4?s=110" alt="Author&#39;s picture" />
+    
+    <h4 id="about-card-name">Greg Harvey</h4>
+    
+      <div id="about-card-bio">Statistics student interested in analytics for sports and economics</div>
+    
+    
+      <div id="about-card-job">
+        <i class="fa fa-briefcase"></i>
+        <br/>
+        Student at UF
+      </div>
+    
+    
+      <div id="about-card-location">
+        <i class="fa fa-map-marker"></i>
+        <br/>
+        Florida
+      </div>
+    
+  </div>
+</div>
+
+    <div id="algolia-search-modal" class="modal-container">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="close-button"><i class="fa fa-close"></i></span>
+      <a href="https://algolia.com" target="_blank" rel="noopener" class="searchby-algolia text-color-light link-unstyled">
+        <span class="searchby-algolia-text text-color-light text-small">by</span>
+        <img class="searchby-algolia-logo" src="https://www.algolia.com/static_assets/images/press/downloads/algolia-light.svg">
+      </a>
+      <i class="search-icon fa fa-search"></i>
+      <form id="algolia-search-form">
+        <input type="text" id="algolia-search-input" name="search"
+          class="form-control input--large search-input" placeholder="Search" />
+      </form>
+    </div>
+    <div class="modal-body">
+      <div class="no-result text-color-light text-center">no post found</div>
+      <div class="results">
+        
+        
+          <div class="media">
+            
+            <div class="media-body">
+              <a class="link-unstyled" href="/2018/07/getting-pi-with-monte-carlo-and-law-of-large-numbers-law-of-averages/">
+                <h3 class="media-heading">Getting Pi with Monte Carlo and Law of Large Numbers/Law of Averages</h3>
+              </a>
+              <span class="media-meta">
+                <span class="media-date text-small">
+                  Jul 7, 2018
+                </span>
+              </span>
+              <div class="media-content hide-xs font-merryweather">Making BetsBeing around sports and specifically sports betting I often see what many people call the Gambler’s fallacy. A common example of this is given by the following thought experiment:
+Say somone flips a coin 99 times all landing on heads, but says the coin is fair. Then asks what are the odds of getting tails on my next toss?
+Commiting the Gambler’s fallacy would be to say that it is more likely to land tails because it is due.</div>
+            </div>
+            <div style="clear:both;"></div>
+            <hr>
+          </div>
+        
+          <div class="media">
+            
+            <div class="media-body">
+              <a class="link-unstyled" href="/2018/04/pga-analysis/">
+                <h3 class="media-heading">PGA Analysis</h3>
+              </a>
+              <span class="media-meta">
+                <span class="media-date text-small">
+                  Apr 4, 2018
+                </span>
+              </span>
+              <div class="media-content hide-xs font-merryweather">Do PGA Golfers Preform Better in Different Regions or Rounds?Many times I hear either on TV or through friends that X golfer preforms better in round 4 or that X golfer seems to play better in the south. Intuitively I can see the case for both, some golfers may preform better on a given round due to their mindset. It is even easier to understand that players may play better in a given region, due to being in an area they are comfortable with or grew up and where they are more familiar with the typical layouts of courses or the grass of the course so lets look into it.</div>
+            </div>
+            <div style="clear:both;"></div>
+            <hr>
+          </div>
+        
+          <div class="media">
+            
+            <div class="media-body">
+              <a class="link-unstyled" href="/2017/08/nfl-finally-an-api/">
+                <h3 class="media-heading">NFL finally an API</h3>
+              </a>
+              <span class="media-meta">
+                <span class="media-date text-small">
+                  Aug 8, 2017
+                </span>
+              </span>
+              <div class="media-content hide-xs font-merryweather">Football is backThe best time of the year is finally here and we finally get to watch football every weekend again.
+In previous cases getting data was one of the biggest challenges for example in golf we had to scrape multiple sites for what data we wanted. However, maybe because the NFL is more popular it is more streamlined with data. Their are many more articles and pages developed to NFL analytics and there even exists a nice handy R NFL scraper cleverly named nflscrapR.</div>
+            </div>
+            <div style="clear:both;"></div>
+            <hr>
+          </div>
+        
+          <div class="media">
+            
+            <div class="media-body">
+              <a class="link-unstyled" href="/2017/08/overwatch-player-aggregated-stats/">
+                <h3 class="media-heading">Overwatch Player Aggregated Stats</h3>
+              </a>
+              <span class="media-meta">
+                <span class="media-date text-small">
+                  Aug 8, 2017
+                </span>
+              </span>
+              <div class="media-content hide-xs font-merryweather">In my free time I spend much of my time playing Overwatch or trying to learn the game. I really enjoy the game and looked into how I could get some stats to find improvements in my game and maybe others as well. There are and were a few problems that I encountered when doing some research on this topic.
+Major IssuesThe APIs that were available were mediocreThe stats available are agregrated vice individual stats for each gameNo easy way that I know of to get lots of player’s statsThe first issue I was able to solve by creating a scraper.</div>
+            </div>
+            <div style="clear:both;"></div>
+            <hr>
+          </div>
+        
+          <div class="media">
+            
+            <div class="media-body">
+              <a class="link-unstyled" href="/2017/08/creating-golf-scores-database/">
+                <h3 class="media-heading">Creating Golf Scores Database</h3>
+              </a>
+              <span class="media-meta">
+                <span class="media-date text-small">
+                  Aug 8, 2017
+                </span>
+              </span>
+              <div class="media-content hide-xs font-merryweather">The goal of this post is to create a database with all the scores recorded on golf tours. ESPN holds all the scorecards of players for each tournament dating back to 2001.
+We are going to start out by exploring around the ESPN website to find out how the data is stored and a way to scrape the data into R and then we are going to export this big data to SQL.</div>
+            </div>
+            <div style="clear:both;"></div>
+            <hr>
+          </div>
+        
+          <div class="media">
+            
+            <div class="media-body">
+              <a class="link-unstyled" href="/2017/07/scraping-pga-site/">
+                <h3 class="media-heading">Scraping PGA Site</h3>
+              </a>
+              <span class="media-meta">
+                <span class="media-date text-small">
+                  Jul 7, 2017
+                </span>
+              </span>
+              <div class="media-content hide-xs font-merryweather">To begin we want to use the json data from the PGA tour website. After doing some investigation into the PGA tour website, there are both pros and cons of using it for scraping.
+From what I have found we will only be able to get shot data from 2014 and beyond. This will contain any data we would want but only goes back to 2014, before 2014 there isn’t even data for simple scorecards for players.</div>
+            </div>
+            <div style="clear:both;"></div>
+            <hr>
+          </div>
+        
+          <div class="media">
+            
+            <div class="media-body">
+              <a class="link-unstyled" href="/2017/07/the-hole-cloud/">
+                <h3 class="media-heading">The Hole Cloud</h3>
+              </a>
+              <span class="media-meta">
+                <span class="media-date text-small">
+                  Jul 7, 2017
+                </span>
+              </span>
+              <div class="media-content hide-xs font-merryweather">In this post I will create word clouds to help determine what may or may not be important in predicting PGA golfers performance. I will start with gathering data from the PGA tour website.
+
+In this example I will be using descriptions from TPC Sawgrass golf course which hosts the Players Championship every year and is one of the most iconic course in the game. The hole descriptions in website format can be found here.</div>
+            </div>
+            <div style="clear:both;"></div>
+            <hr>
+          </div>
+        
+      </div>
+    </div>
+    <div class="modal-footer">
+      <p class="results-count text-medium"
+         data-message-zero="no post found"
+         data-message-one="1 post found"
+         data-message-other="{n} posts found">
+         7 posts found
+      </p>
+    </div>
+  </div>
+</div>
+    
+  
+    
+    <div id="cover" style="background-image:url('http://res.cloudinary.com/gharv/image/upload/v1501069243/cover2_om1zcy.jpg');"></div>
+  
+
+
+    
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.2.4/jquery.min.js" integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44=" crossorigin="anonymous"></script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/2.1.7/js/jquery.fancybox.min.js" integrity="sha256-GEAnjcTqVP+vBp3SSc8bEDQqvWAZMiHyUSIorrWwH50=" crossorigin="anonymous"></script>
+
+
+<script src="/js/script-qi9wbxp2ya2j6p7wx1i6tgavftewndznf4v0hy2gvivk1rxgc3lm7njqb6bz.min.js"></script>
+
+
+
+
+  
+    
+      <script>
+        var disqus_config = function () {
+          this.page.url = '\/2017\/07\/the-hole-cloud\/';
+          
+            this.page.identifier = '\/2017\/07\/the-hole-cloud\/'
+          
+        };
+        (function() {
+          
+          
+          if (window.location.hostname == "localhost") {
+            return;
+          }
+          var d = document, s = d.createElement('script');
+          var disqus_shortname = 'gharv-github-io';
+          s.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+
+          s.setAttribute('data-timestamp', +new Date());
+          (d.head || d.body).appendChild(s);
+        })();
+      </script>
+    
+  
+
+
+
+    
+  </body>
+</html>
+

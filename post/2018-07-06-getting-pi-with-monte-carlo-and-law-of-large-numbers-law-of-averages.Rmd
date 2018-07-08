@@ -1,0 +1,73 @@
+---
+title: Getting Pi with Monte Carlo and Law of Large Numbers/Law of Averages
+author: Greg Harvey
+date: '2018-07-06'
+slug: getting-pi-with-monte-carlo-and-law-of-large-numbers-law-of-averages
+categories:
+  - Theory
+tags:
+  - R
+  - Monte Carlo
+  - Law of Large Numbers
+description: See how a typical person can mistake the Law of Large Numbers and apply its result to commiting the Gambler's fallacy. Monte Carlo is a process in which we can test these theories with examples of simple coin flips and even being able to solve for the value of pi.
+---
+
+# Making Bets
+
+Being around sports and specifically sports betting I often see what many people call the [Gambler's fallacy](https://en.wikipedia.org/wiki/Gambler's_fallacy). A common example of this is given by the following thought experiment:  
+
+Say somone flips a coin 99 times all landing on heads, but says the coin is fair. Then asks what are the odds of getting tails on my next toss?  
+
+Commiting the Gambler's fallacy would be to say that it is more likely to land tails because it is *due.* Someone who is purely hypothetical would say that it is 50:50 concluding the odds are not affected by the previous outcomes. Another interesting spin on this is the Ludic fallacy meaning "the misuse of games to model real-life situations" coined by my favorite author [Nassim Taleb](https://en.wikipedia.org/wiki/Nassim_Nicholas_Taleb).  
+
+In his books he has this example in which two characters give different answers. Fat Tony is the foil to Dr. John. Dr. John is nerdy, meticulous, careful and academic; Fat Tony is confident, loud, careless and shrewd. Both of them make errors, but of different types. Fat Tony gives the answer that the initial assumption of 50:50 is most likely incorrect and "The coin gotta be loaded. It can't be a fair game." While Dr. John gives the hypotheticaly answer.  
+
+
+So what are the chances of getting 100 heads in a row?
+```{r}
+# Assuming a fair coin, each flip has 0.5 chance of landing heads
+0.5 ^ 100
+```
+
+Does this mean heads or tails is more likely? Well no if the assumption holds.
+```{r}
+# Probability of getting 99 heads and 1 tail
+0.5 ^ 99 * 0.5
+
+# Probability of getting 99 heads and another heads
+0.5 ^ 99 * 0.5
+```
+
+As we can see all of these outcomes have equal chance of occuring. Commiting the Gambler's fallacy would say conclude that tails has a large chance then $0.5$. If they assumed tails was *due* meaning tails chance was say for example $0.75$ we would get a deviation from the true probability shown above.
+```{r}
+0.5 ^ 99 * 0.75
+```
+
+# What should we know
+
+So we can see the mistakes made but what should we take away from this? Understanding the common pitfalls of probability is very important but we can also use this Law of Large Numbers to solve other problems. For example $\pi$ is not able to be solved to an exact number but most of us know it is about $3.14$. We can use Monte Carlo to simulate this problem to get an answer close to $\pi$.  
+
+Draw a square of sides 2, centered at the origin and inside the square draw a circle of radius 1.
+
+![](http://res.cloudinary.com/gharv/image/upload/v1530919852/unit-circle_u2k8lb.png)
+
+Now we can generate numbers from a uniform distribution from $(-1,1)$ for two variables say $X, Y$. Let $B = 1$ if the poin is in the circle and $B = 0$ if the point is not in the circle. Repeat $n$ times, and form $\overline{B}$ to be the fraction of times the point falls inside the circle.  
+
+```{r}
+set.seed(123)
+n <- 1000000
+x <- runif(n=n, min=-1, max=1)
+y <- runif(n=n, min=-1, max=1)
+z <- x^2 + y^2
+(estimate_pi <- 4 * sum(z<1) / n)
+```
+
+As we can see this comes pretty close to the value of $\pi$ we currently have [$3.14159$](https://en.wikipedia.org/wiki/Pi).
+
+
+
+
+
+
+
+

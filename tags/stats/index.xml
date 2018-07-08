@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Stats on Sportnomics</title>
+    <link>/tags/stats/</link>
+    <description>Recent content in Stats on Sportnomics</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Mon, 21 Aug 2017 00:00:00 +0000</lastBuildDate>
+    
+	<atom:link href="/tags/stats/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Overwatch Player Aggregated Stats</title>
+      <link>/2017/08/overwatch-player-aggregated-stats/</link>
+      <pubDate>Mon, 21 Aug 2017 00:00:00 +0000</pubDate>
+      
+      <guid>/2017/08/overwatch-player-aggregated-stats/</guid>
+      <description>In my free time I spend much of my time playing Overwatch or trying to learn the game. I really enjoy the game and looked into how I could get some stats to find improvements in my game and maybe others as well. There are and were a few problems that I encountered when doing some research on this topic.
+Major IssuesThe APIs that were available were mediocreThe stats available are agregrated vice individual stats for each gameNo easy way that I know of to get lots of player’s statsThe first issue I was able to solve by creating a scraper.</description>
+    </item>
+    
+  </channel>
+</rss>

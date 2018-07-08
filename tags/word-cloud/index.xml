@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Word Cloud on Sportnomics</title>
+    <link>/tags/word-cloud/</link>
+    <description>Recent content in Word Cloud on Sportnomics</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Mon, 24 Jul 2017 00:00:00 +0000</lastBuildDate>
+    
+	<atom:link href="/tags/word-cloud/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>The Hole Cloud</title>
+      <link>/2017/07/the-hole-cloud/</link>
+      <pubDate>Mon, 24 Jul 2017 00:00:00 +0000</pubDate>
+      
+      <guid>/2017/07/the-hole-cloud/</guid>
+      <description>In this post I will create word clouds to help determine what may or may not be important in predicting PGA golfers performance. I will start with gathering data from the PGA tour website.
+
+In this example I will be using descriptions from TPC Sawgrass golf course which hosts the Players Championship every year and is one of the most iconic course in the game. The hole descriptions in website format can be found here.</description>
+    </item>
+    
+  </channel>
+</rss>
