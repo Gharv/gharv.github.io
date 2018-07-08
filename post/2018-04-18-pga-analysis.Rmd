@@ -24,7 +24,7 @@ In order to preform this analysis we are going to split regions of the USA into:
 * South
 * West
 
-These regions we chosen based off how the US Census Bureau splits regions. Below we will import our data from the previous post and a few libraries we will use throughout.
+These regions we have chosen are based off how the US Census Bureau splits regions. Below we will import our data from the previous post and a few libraries we will use throughout.
 
 ```{r message=FALSE}
 library(ggplot2)
@@ -48,9 +48,9 @@ This contains a sample of the PGA hole scores data from 2007 to 2017. Specifical
 
 For this example I will just look into one single player for brevity, which I will choose Phil Mickelson and determine if the region he plays or the round he plays or their interaction has an effect on his score of a hole.
 
-<div style="width:1024px; height:576px">
+<center>
 ![](http://res.cloudinary.com/gharv/image/upload/v1524415034/phil_start_j9uyo4.jpg)
-</div>
+</center>
 
 ```{r}
 pm <- filter(df, PlayerName == "Phil Mickelson" & Region != "hawaii" & Round != 5)
@@ -83,10 +83,9 @@ The first assumption we assume that players are trying equally on all holes whic
 
 The second assumption doesn't have to feel so hand wavy, we can actually plot the data to check our assumption of normality. A common approach to achieve this is to look that a Normal Q-Q Plot given below:  
 
-```{r eval=FALSE}
+```{r fig.align='center'}
 hist(pm$ScoreAdj)
 ```
-![](http://res.cloudinary.com/gharv/image/upload/v1524416725/hist_kvo9yp.jpg)
 For the above histogram the data looks fairly normal.
 
 

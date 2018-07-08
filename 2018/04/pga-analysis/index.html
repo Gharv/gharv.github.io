@@ -285,7 +285,7 @@
 <li>South</li>
 <li>West</li>
 </ul>
-<p>These regions we chosen based off how the US Census Bureau splits regions. Below we will import our data from the previous post and a few libraries we will use throughout.</p>
+<p>These regions we have chosen are based off how the US Census Bureau splits regions. Below we will import our data from the previous post and a few libraries we will use throughout.</p>
 <pre class="r"><code>library(ggplot2)
 library(dplyr)
 library(knitr)
@@ -303,9 +303,9 @@ df &lt;- read.csv(&quot;https://github.com/Gharv/PGA/blob/master/sample_pga_hole
 <h2>Balanced Factorial Design with Two Treatment Factors</h2>
 <p><img src="http://res.cloudinary.com/gharv/image/upload/v1524414853/design_ex_rd8pef.png" /></p>
 <p>For this example I will just look into one single player for brevity, which I will choose Phil Mickelson and determine if the region he plays or the round he plays or their interaction has an effect on his score of a hole.</p>
-<div style="width:1024px; height:576px">
-<p><img src="http://res.cloudinary.com/gharv/image/upload/v1524415034/phil_start_j9uyo4.jpg" /></p>
-</div>
+<center>
+<img src="http://res.cloudinary.com/gharv/image/upload/v1524415034/phil_start_j9uyo4.jpg" />
+</center>
 <pre class="r"><code>pm &lt;- filter(df, PlayerName == &quot;Phil Mickelson&quot; &amp; Region != &quot;hawaii&quot; &amp; Round != 5)
 pm[,c(&quot;Region&quot;, &quot;Round&quot;)] &lt;- lapply(pm[,c(&quot;Region&quot;, &quot;Round&quot;)], factor)
 pm &lt;- mutate(pm, ScoreAdj = Strokes - Par.x)
@@ -414,16 +414,18 @@ aov2 &lt;- aov(ScoreAdj ~ Region, data = pm)</code></pre>
 <p>The first assumption we assume that players are trying equally on all holes which gives us independence among each hole. In reality there are many things that can effect a player, golf is one of those sports that can be very mental which can effect this assumption but here we are going to assume each player gives equal effort for each hole.</p>
 <p>The second assumption doesn’t have to feel so hand wavy, we can actually plot the data to check our assumption of normality. A common approach to achieve this is to look that a Normal Q-Q Plot given below:</p>
 <pre class="r"><code>hist(pm$ScoreAdj)</code></pre>
-<p><img src="http://res.cloudinary.com/gharv/image/upload/v1524416725/hist_kvo9yp.jpg" />
+<p><img src="/post/2018-04-18-pga-analysis_files/figure-html/unnamed-chunk-3-1.png" width="672" style="display: block; margin: auto;" />
 For the above histogram the data looks fairly normal.</p>
 <p>The third assumption of equal variance can be checked with the levene’s test which we run below:</p>
 <pre class="r"><code>library(car)</code></pre>
 <pre><code>## Warning: package &#39;car&#39; was built under R version 3.5.1</code></pre>
 <pre class="r"><code>leveneTest(fit2)</code></pre>
 <pre><code>## Levene&#39;s Test for Homogeneity of Variance (center = median)
-##         Df F value Pr(&gt;F)
-## group    3   0.875 0.4532
-##       6044</code></pre>
+##         Df F value  Pr(&gt;F)  
+## group    3   2.939 0.03191 *
+##       6044                  
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
 <p>From the output above we can see that the p-value is not less than the significance level of 0.05. This means that there is no evidence to suggest that the variance across groups is statistically significantly different. Therefore, we can assume the homogeneity of variances in the different treatment groups.</p>
 </div>
 <div id="continue-with-our-model" class="section level2">
@@ -446,32 +448,32 @@ kable(anova(fit1), digits = 4)</code></pre>
 <tr class="odd">
 <td>Region</td>
 <td align="right">3</td>
-<td align="right">6.1832</td>
-<td align="right">2.0611</td>
-<td align="right">4.1889</td>
-<td align="right">0.0057</td>
+<td align="right">4.7890</td>
+<td align="right">1.5963</td>
+<td align="right">3.3468</td>
+<td align="right">0.0183</td>
 </tr>
 <tr class="even">
 <td>Round</td>
 <td align="right">3</td>
-<td align="right">0.4583</td>
-<td align="right">0.1528</td>
-<td align="right">0.3105</td>
-<td align="right">0.8178</td>
+<td align="right">0.1541</td>
+<td align="right">0.0514</td>
+<td align="right">0.1077</td>
+<td align="right">0.9556</td>
 </tr>
 <tr class="odd">
 <td>Region:Round</td>
 <td align="right">9</td>
-<td align="right">2.3843</td>
-<td align="right">0.2649</td>
-<td align="right">0.5384</td>
-<td align="right">0.8475</td>
+<td align="right">4.5800</td>
+<td align="right">0.5089</td>
+<td align="right">1.0669</td>
+<td align="right">0.3838</td>
 </tr>
 <tr class="even">
 <td>Residuals</td>
 <td align="right">6032</td>
-<td align="right">2967.9577</td>
-<td align="right">0.4920</td>
+<td align="right">2877.1270</td>
+<td align="right">0.4770</td>
 <td align="right"></td>
 <td align="right"></td>
 </tr>
@@ -494,16 +496,16 @@ kable(anova(fit1), digits = 4)</code></pre>
 <tr class="odd">
 <td>Region</td>
 <td align="right">3</td>
-<td align="right">6.1832</td>
-<td align="right">2.0611</td>
-<td align="right">4.1932</td>
-<td align="right">0.0057</td>
+<td align="right">4.789</td>
+<td align="right">1.5963</td>
+<td align="right">3.3479</td>
+<td align="right">0.0183</td>
 </tr>
 <tr class="even">
 <td>Residuals</td>
 <td align="right">6044</td>
-<td align="right">2970.8003</td>
-<td align="right">0.4915</td>
+<td align="right">2881.861</td>
+<td align="right">0.4768</td>
 <td align="right"></td>
 <td align="right"></td>
 </tr>
@@ -517,20 +519,20 @@ kable(anova(fit1), digits = 4)</code></pre>
 ## 
 ## Residuals:
 ##     Min      1Q  Median      3Q     Max 
-## -2.0040 -0.0040  0.0218  0.0840  6.0840 
+## -1.9934  0.0066  0.0304  0.0827  4.0827 
 ## 
 ## Coefficients:
-##                  Estimate Std. Error t value Pr(&gt;|t|)    
-## (Intercept)      0.003968   0.018030   0.220 0.825808    
-## Regionnortheast -0.038360   0.025498  -1.504 0.132531    
-## Regionsouth     -0.025794   0.025498  -1.012 0.311781    
-## Regionwest      -0.087963   0.025498  -3.450 0.000565 ***
+##                  Estimate Std. Error t value Pr(&gt;|t|)   
+## (Intercept)     -0.006614   0.017758  -0.372  0.70958   
+## Regionnortheast -0.023810   0.025114  -0.948  0.34314   
+## Regionsouth     -0.046958   0.025114  -1.870  0.06156 . 
+## Regionwest      -0.076058   0.025114  -3.029  0.00247 **
 ## ---
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## 
-## Residual standard error: 0.7011 on 6044 degrees of freedom
-## Multiple R-squared:  0.002077,   Adjusted R-squared:  0.001582 
-## F-statistic: 4.193 on 3 and 6044 DF,  p-value: 0.005672</code></pre>
+## Residual standard error: 0.6905 on 6044 degrees of freedom
+## Multiple R-squared:  0.001659,   Adjusted R-squared:  0.001163 
+## F-statistic: 3.348 on 3 and 6044 DF,  p-value: 0.01826</code></pre>
 <pre class="r"><code>kable(TukeyHSD(aov2, which = &quot;Region&quot;)$Region)</code></pre>
 <table>
 <thead>
@@ -545,45 +547,45 @@ kable(anova(fit1), digits = 4)</code></pre>
 <tbody>
 <tr class="odd">
 <td>northeast-midwest</td>
-<td align="right">-0.0383598</td>
-<td align="right">-0.1038843</td>
-<td align="right">0.0271647</td>
-<td align="right">0.4348582</td>
+<td align="right">-0.0238095</td>
+<td align="right">-0.0883458</td>
+<td align="right">0.0407267</td>
+<td align="right">0.7788294</td>
 </tr>
 <tr class="even">
 <td>south-midwest</td>
-<td align="right">-0.0257937</td>
-<td align="right">-0.0913182</td>
-<td align="right">0.0397309</td>
-<td align="right">0.7426621</td>
+<td align="right">-0.0469577</td>
+<td align="right">-0.1114939</td>
+<td align="right">0.0175786</td>
+<td align="right">0.2412228</td>
 </tr>
 <tr class="odd">
 <td>west-midwest</td>
-<td align="right">-0.0879630</td>
-<td align="right">-0.1534875</td>
-<td align="right">-0.0224384</td>
-<td align="right">0.0031687</td>
+<td align="right">-0.0760582</td>
+<td align="right">-0.1405944</td>
+<td align="right">-0.0115220</td>
+<td align="right">0.0131739</td>
 </tr>
 <tr class="even">
 <td>south-northeast</td>
-<td align="right">0.0125661</td>
-<td align="right">-0.0529584</td>
-<td align="right">0.0780907</td>
-<td align="right">0.9607140</td>
+<td align="right">-0.0231481</td>
+<td align="right">-0.0876844</td>
+<td align="right">0.0413881</td>
+<td align="right">0.7932327</td>
 </tr>
 <tr class="odd">
 <td>west-northeast</td>
-<td align="right">-0.0496032</td>
-<td align="right">-0.1151277</td>
-<td align="right">0.0159214</td>
-<td align="right">0.2092751</td>
+<td align="right">-0.0522487</td>
+<td align="right">-0.1167849</td>
+<td align="right">0.0122876</td>
+<td align="right">0.1595744</td>
 </tr>
 <tr class="even">
 <td>west-south</td>
-<td align="right">-0.0621693</td>
-<td align="right">-0.1276938</td>
-<td align="right">0.0033552</td>
-<td align="right">0.0701911</td>
+<td align="right">-0.0291005</td>
+<td align="right">-0.0936368</td>
+<td align="right">0.0354357</td>
+<td align="right">0.6529584</td>
 </tr>
 </tbody>
 </table>
@@ -600,21 +602,21 @@ kable(anova(fit1), digits = 4)</code></pre>
 <tbody>
 <tr class="odd">
 <td>northeast</td>
-<td align="right">0.1987970</td>
+<td align="right">0.3567072</td>
 <td align="right"></td>
 <td align="right"></td>
 </tr>
 <tr class="even">
 <td>south</td>
-<td align="right">0.3741367</td>
-<td align="right">0.6221578</td>
+<td align="right">0.1231222</td>
+<td align="right">0.3567072</td>
 <td align="right"></td>
 </tr>
 <tr class="odd">
 <td>west</td>
-<td align="right">0.0033898</td>
-<td align="right">0.1035604</td>
-<td align="right">0.0443724</td>
+<td align="right">0.0148068</td>
+<td align="right">0.1125728</td>
+<td align="right">0.3567072</td>
 </tr>
 </tbody>
 </table>

@@ -66,13 +66,13 @@
   </url>
   
   <url>
-    <loc>/tags/esports/</loc>
+    <loc>/categories/esports/</loc>
     <lastmod>2017-08-21T00:00:00+00:00</lastmod>
     <priority>0</priority>
   </url>
   
   <url>
-    <loc>/categories/esports/</loc>
+    <loc>/tags/esports/</loc>
     <lastmod>2017-08-21T00:00:00+00:00</lastmod>
     <priority>0</priority>
   </url>
@@ -84,13 +84,13 @@
   </url>
   
   <url>
-    <loc>/tags/golf/</loc>
+    <loc>/categories/golf/</loc>
     <lastmod>2018-04-21T00:00:00+00:00</lastmod>
     <priority>0</priority>
   </url>
   
   <url>
-    <loc>/categories/golf/</loc>
+    <loc>/tags/golf/</loc>
     <lastmod>2018-04-21T00:00:00+00:00</lastmod>
     <priority>0</priority>
   </url>
