@@ -288,7 +288,9 @@
 <h1>What should we know</h1>
 <p>So we can see the mistakes made but what should we take away from this? Understanding the common pitfalls of probability is very important but we can also use this Law of Large Numbers to solve other problems. For example <span class="math inline">\(\pi\)</span> is not able to be solved to an exact number but most of us know it is about <span class="math inline">\(3.14\)</span>. We can use Monte Carlo to simulate this problem to get an answer close to <span class="math inline">\(\pi\)</span>.</p>
 <p>Draw a square of sides 2, centered at the origin and inside the square draw a circle of radius 1.</p>
-<p><img src="http://res.cloudinary.com/gharv/image/upload/v1530919852/unit-circle_u2k8lb.png" /></p>
+<center>
+<img src="http://res.cloudinary.com/gharv/image/upload/v1530919852/unit-circle_u2k8lb.png" />
+</center>
 <p>Now we can generate numbers from a uniform distribution from <span class="math inline">\((-1,1)\)</span> for two variables say <span class="math inline">\(X, Y\)</span>. Let <span class="math inline">\(B = 1\)</span> if the poin is in the circle and <span class="math inline">\(B = 0\)</span> if the point is not in the circle. Repeat <span class="math inline">\(n\)</span> times, and form <span class="math inline">\(\overline{B}\)</span> to be the fraction of times the point falls inside the circle.</p>
 <pre class="r"><code>set.seed(123)
 n &lt;- 1000000

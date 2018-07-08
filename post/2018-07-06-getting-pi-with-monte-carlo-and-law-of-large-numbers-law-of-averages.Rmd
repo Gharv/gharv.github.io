@@ -49,7 +49,10 @@ So we can see the mistakes made but what should we take away from this? Understa
 
 Draw a square of sides 2, centered at the origin and inside the square draw a circle of radius 1.
 
+<center>
 ![](http://res.cloudinary.com/gharv/image/upload/v1530919852/unit-circle_u2k8lb.png)
+</center>
+
 
 Now we can generate numbers from a uniform distribution from $(-1,1)$ for two variables say $X, Y$. Let $B = 1$ if the poin is in the circle and $B = 0$ if the point is not in the circle. Repeat $n$ times, and form $\overline{B}$ to be the fraction of times the point falls inside the circle.  
 
